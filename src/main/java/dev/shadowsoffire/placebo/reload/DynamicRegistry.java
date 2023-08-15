@@ -12,9 +12,12 @@ import dev.shadowsoffire.placebo.json.PSerializer.PSerializable;
 import dev.shadowsoffire.placebo.json.SerializerMap;
 import io.github.fabricators_of_create.porting_lib.event.common.OnDatapackSyncCallback;
 import io.github.fabricators_of_create.porting_lib.util.ServerLifecycleHooks;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,6 +33,8 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+
+import static dev.shadowsoffire.placebo.reload.DynamicRegistry.SyncManagement.syncAll;
 
 /**
  * A Dynamic Registry is a reload listener which acts like a registry. Unlike datapack registries, it can reload.
@@ -208,7 +213,10 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
      */
     public void registerToBus() {
         if (this.synced) SyncManagement.registerForSync(this);
-        this.addReloader();
+        this.addReloader(); //TODO make this do something
+    }
+    public static void sync(){
+        syncAll();
     }
 
     /**
@@ -328,15 +336,25 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
      */
     private void sync(Player player) { //TODO double check this all works
         //PacketTarget target = player == null ? PacketDistributor.ALL.noArg() : PacketDistributor.PLAYER.with(() -> player);
-        if (player == null) return;
         ServerPlayer sp = (ServerPlayer) player;
+        if (player == null) {
+            ReloadListenerPacket.Start.sendToAll(this.path);
+            this.registry.forEach((k, v) -> {
+                ReloadListenerPacket.Content.Provider.sendToAll(this.path, k, v);
+            });
+            ReloadListenerPacket.End.sendToAll(this.path);
+        } else {
+            ReloadListenerPacket.Start.sendTo(sp, this.path);
+            this.registry.forEach((k, v) -> {
+                ReloadListenerPacket.Content.Provider.sendTo(sp, this.path, k, v);
+            });
+            ReloadListenerPacket.End.sendTo(sp, this.path);
+        }
         FriendlyByteBuf buf = PacketByteBufs.create();
         ServerPlayNetworking.createS2CPacket(id, buf);
         ReloadListenerPacket.Start.init(sp, this.path);
+        ReloadListenerPacket.Content.Provider.init();
     //    Placebo.CHANNEL.sendToClient(new ReloadListenerPacket.Start(this.path), sp);
-        this.registry.forEach((k, v) -> {
-    //        Placebo.CHANNEL.send(sp, new ReloadListenerPacket.Content<>(this.path, k, v));
-        });
     //    Placebo.CHANNEL.send(sp, new ReloadListenerPacket.End(this.path));
     }
 
@@ -359,7 +377,7 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
             if (!listener.synced) throw new UnsupportedOperationException("Attempted to register the non-synced JSON Reload Listener " + listener.path + " as a synced listener!");
             synchronized (SYNC_REGISTRY) {
                 if (SYNC_REGISTRY.containsKey(listener.path)) throw new UnsupportedOperationException("Attempted to register the JSON Reload Listener for syncing " + listener.path + " but one already exists!");
-                if (SYNC_REGISTRY.isEmpty()) SyncManagement.syncAll();
+                if (SYNC_REGISTRY.isEmpty())  syncAll();
                 SYNC_REGISTRY.put(listener.path, listener);
             }
         }
@@ -445,11 +463,10 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
             if (value != null) consumer.accept(path, value);
         }
 
-        private static void syncAll() {
-            OnDatapackSyncCallback.EVENT.register((playerList, player) ->
-                    SYNC_REGISTRY.values().forEach(r -> r.sync(player))
-                    );
-
+        public static void syncAll() {
+            ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
+                SYNC_REGISTRY.values().forEach(r -> r.sync(player));
+            });
         }
     }
 

@@ -2,6 +2,7 @@ package dev.shadowsoffire.placebo.reload;
 
 import com.mojang.datafixers.util.Either;
 import dev.shadowsoffire.placebo.Placebo;
+import dev.shadowsoffire.placebo.cap.InternalItemHandler;
 import dev.shadowsoffire.placebo.events.ServerEvents;
 import dev.shadowsoffire.placebo.json.PSerializer.PSerializable;
 
@@ -46,6 +47,7 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
                 SyncManagement.initSync(msg);
             }));
             sendTo(player, path);
+
         }
 
         public static void sendTo(ServerPlayer player, String path) {
@@ -53,6 +55,8 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
             buf.writeUtf(path, 50);
             ServerPlayNetworking.send(player, ID, buf);
         }
+
+
         /*
             public void write(Start msg, FriendlyByteBuf buf) {
                 buf.writeUtf(msg.path, 50);
@@ -69,7 +73,7 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
     }
 
     public static class Content<V extends TypeKeyed & PSerializable<? super V>> extends ReloadListenerPacket<Content<V>> {
-
+        public static ResourceLocation ID = new ResourceLocation(Placebo.MODID, "reload_listener_content");
         final ResourceLocation key;
         final Either<V, FriendlyByteBuf> data;
 
@@ -89,17 +93,16 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
             FriendlyByteBuf buf = this.data.right().get();
             try {
                 return SyncManagement.readItem(path, key, buf);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Placebo.LOGGER.error("Failure when deserializing a dynamic registry object via network: Registry: {}, Object ID: {}", path, key);
                 ex.printStackTrace();
                 throw new RuntimeException(ex);
-            }
-            finally {
+            } finally {
                 buf.release();
             }
         }
 
+        public static class Provider<V extends TypeKeyed & PSerializable<? super V>> {
 
             public void write(Content<V> msg, FriendlyByteBuf buf) {
                 buf.writeUtf(msg.path, 50);
@@ -116,11 +119,39 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
             public void handle(Content<V> msg) {
                 SyncManagement.acceptItem(msg.path, msg.readItem());
 
+            }
+
+            public static <V extends TypeKeyed> void init() {
+                ClientPlayNetworking.registerGlobalReceiver(ID, ((client, handler, buf, responseSender) -> {
+                    String path = buf.readUtf(50);
+                    ResourceLocation key = buf.readResourceLocation();
+                    V item = SyncManagement.readItem(path, key, buf);
+                    SyncManagement.acceptItem(path, item);
+                }));
+            }
+
+            public static <V extends TypeKeyed & PSerializable<? super V>> void sendTo(ServerPlayer player, String path, ResourceLocation k, V v) {
+                FriendlyByteBuf buf = PacketByteBufs.create();
+                buf.writeUtf(path, 50);
+                buf.writeResourceLocation(k);
+                SyncManagement.writeItem(path, v, buf); //TODO might not work idfk
+                ServerPlayNetworking.send(player, ID, buf);
+            }
+
+            public static <V extends TypeKeyed & PSerializable<? super V>> void sendToAll(String path, ResourceLocation k, V v) {
+                if (ServerEvents.getCurrentServer() != null) {
+                    List<ServerPlayer> list = ServerEvents.getCurrentServer().getPlayerList().getPlayers();
+                    for (ServerPlayer p : list) {
+                        sendTo(p, path, k, v);
+                    }
+                }
+            }
         }
+
     }
 
     public static class End extends ReloadListenerPacket<End> {
-
+        public static ResourceLocation ID = new ResourceLocation(Placebo.MODID, "reload_listener_end");
         public End(String path) {
             super(path);
         }
@@ -136,5 +167,21 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
         public void handle(End msg) {
             SyncManagement.endSync(msg.path);
         }
+
+        public static void sendToAll(String path) {
+            if (ServerEvents.getCurrentServer() != null) {
+                List<ServerPlayer> list = ServerEvents.getCurrentServer().getPlayerList().getPlayers();
+                for (ServerPlayer p : list) {
+                    sendTo(p, path);
+                }
+            }
+        }
+
+        public static void sendTo(ServerPlayer player, String path) {
+            FriendlyByteBuf buf = PacketByteBufs.create();
+            buf.writeUtf(path, 50);
+            ServerPlayNetworking.send(player, ID, buf);
+        }
+
     }
 }

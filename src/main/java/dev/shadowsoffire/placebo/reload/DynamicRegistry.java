@@ -10,9 +10,7 @@ import dev.shadowsoffire.placebo.json.JsonUtil;
 import dev.shadowsoffire.placebo.json.PSerializer;
 import dev.shadowsoffire.placebo.json.PSerializer.PSerializable;
 import dev.shadowsoffire.placebo.json.SerializerMap;
-import io.github.fabricators_of_create.porting_lib.event.common.OnDatapackSyncCallback;
 import io.github.fabricators_of_create.porting_lib.util.ServerLifecycleHooks;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -21,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -31,7 +30,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 
 import static dev.shadowsoffire.placebo.reload.DynamicRegistry.SyncManagement.syncAll;
@@ -149,6 +150,7 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
             }
         });
         this.onReload();
+        Placebo.LOGGER.error("DynamicRegistry apply");
     }
 
     /**
@@ -213,9 +215,10 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
      */
     public void registerToBus() {
         if (this.synced) SyncManagement.registerForSync(this);
-        this.addReloader(); //TODO make this do something
+         //TODO make this do something
     }
     public static void sync(){
+        Placebo.LOGGER.error("DynamicRegistry sync()");
         syncAll();
     }
 
@@ -315,8 +318,9 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
     /**
      * Adds this reload listener to the {@link ReloadableServerResources}.<br>
      */
-    private void addReloader() {
-    //    e.addListener(this);
+    public List<PreparableReloadListener> addReloader(List<PreparableReloadListener> listeners) {
+        listeners.add(this);
+        return listeners;
     }
 
     /**
@@ -336,14 +340,19 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
      */
     private void sync(Player player) { //TODO double check this all works
         //PacketTarget target = player == null ? PacketDistributor.ALL.noArg() : PacketDistributor.PLAYER.with(() -> player);
+        Placebo.LOGGER.error("Dynamic Registry sync()");
         ServerPlayer sp = (ServerPlayer) player;
+        player.displayClientMessage(Component.literal("THIS IS A TEST "), false);
         if (player == null) {
+            Placebo.LOGGER.error("Dynamic Registry sync() player==null");
             ReloadListenerPacket.Start.sendToAll(this.path);
             this.registry.forEach((k, v) -> {
                 ReloadListenerPacket.Content.Provider.sendToAll(this.path, k, v);
             });
             ReloadListenerPacket.End.sendToAll(this.path);
         } else {
+            sp.displayClientMessage(Component.literal("TESTCLIENTMESSAGE"), false);
+            Placebo.LOGGER.error("Dynamic Registry sync() player!==null");
             ReloadListenerPacket.Start.sendTo(sp, this.path);
             this.registry.forEach((k, v) -> {
                 ReloadListenerPacket.Content.Provider.sendTo(sp, this.path, k, v);
@@ -377,7 +386,11 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
             if (!listener.synced) throw new UnsupportedOperationException("Attempted to register the non-synced JSON Reload Listener " + listener.path + " as a synced listener!");
             synchronized (SYNC_REGISTRY) {
                 if (SYNC_REGISTRY.containsKey(listener.path)) throw new UnsupportedOperationException("Attempted to register the JSON Reload Listener for syncing " + listener.path + " but one already exists!");
-                if (SYNC_REGISTRY.isEmpty())  syncAll();
+                if (SYNC_REGISTRY.isEmpty()){
+                    Placebo.LOGGER.error("syncAll is being called from registerForSync");
+                    syncAll();
+                }
+                Placebo.LOGGER.error("putting listener in sync registry");
                 SYNC_REGISTRY.put(listener.path, listener);
             }
         }
@@ -465,9 +478,25 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
 
         public static void syncAll() {
             ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
+                Placebo.LOGGER.error("DynamicRegistry syncAll()");
+                player.displayClientMessage(Component.literal("Player :" + player +" has arrrived!"), false);
                 SYNC_REGISTRY.values().forEach(r -> r.sync(player));
             });
         }
     }
+    public static class WrappedStateAwareListener implements PreparableReloadListener {
+        private final PreparableReloadListener wrapped;
 
+        public WrappedStateAwareListener(final PreparableReloadListener wrapped) {
+            this.wrapped = wrapped;
+        }
+
+        @Override
+        public CompletableFuture<Void> reload(final PreparationBarrier stage, final ResourceManager resourceManager, final ProfilerFiller preparationsProfiler, final ProfilerFiller reloadProfiler, final Executor backgroundExecutor, final Executor gameExecutor) {
+            //if (ModLoader.isLoadingStateValid())
+                return wrapped.reload(stage, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);
+            //else
+            //    return CompletableFuture.completedFuture(null);
+        }
+    }
 }

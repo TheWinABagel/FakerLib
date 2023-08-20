@@ -31,7 +31,7 @@ import java.util.function.Consumer;
  */
 @Deprecated // Go use a json
 public final class RecipeHelper {
-
+/*
     private static final Multimap<String, Consumer<RecipeFactory>> PROVIDERS = HashMultimap.create();
 
     protected String modid;
@@ -46,7 +46,7 @@ public final class RecipeHelper {
      * @param provider The recipe provider you are adding.
      * @see {@link RecipeFactory}
      */
-    public void registerProvider(Consumer<RecipeFactory> provider) {
+    /*public void registerProvider(Consumer<RecipeFactory> provider) {
         synchronized (PROVIDERS) {
             if (provider == null) {
                 Placebo.LOGGER.error("Mod {} has attempted to add a null recipe provider.", this.modid);
@@ -65,7 +65,7 @@ public final class RecipeHelper {
      * @return An ItemStack representing <code>thing</code>.
      * @throws IllegalArgumentException if <code>thing</code> is not a valid type.
      */
-    public static ItemStack makeStack(Object thing) {
+    /*public static ItemStack makeStack(Object thing) {
         if (thing instanceof ItemStack stack) return stack;
         if (thing instanceof ItemLike il) return new ItemStack(il);
         //if (thing instanceof RegistryObject<?> ro) return new ItemStack((ItemLike) ro.get());
@@ -85,7 +85,7 @@ public final class RecipeHelper {
      * @param inputArr   An array of potential input objects that are in-order.
      * @return A list of ingredients for a recipe.
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+  /*  @SuppressWarnings({ "rawtypes", "unchecked" })
     public static NonNullList<Ingredient> createInput(String modid, boolean allowEmpty, Object... inputArr) {
         NonNullList<Ingredient> inputL = NonNullList.create();
         for (int i = 0; i < inputArr.length; i++) {
@@ -104,7 +104,7 @@ public final class RecipeHelper {
     /**
      * Generates the reload listener which handles adding all RecipeHelper-based recipes.
      */
-    @ApiStatus.Internal
+   /* @ApiStatus.Internal
     public static PreparableReloadListener getReloader(RecipeManager mgr) {
         return RunnableReloader.of(() -> {
             mutableManager(mgr);
@@ -146,7 +146,7 @@ public final class RecipeHelper {
          *
          * @param rec The recipe to add.
          */
-        public void addRecipe(Recipe<?> rec) {
+      /*  public void addRecipe(Recipe<?> rec) {
             if (rec == null || rec.getId() == null || rec.getSerializer() == null || BuiltInRegistries.RECIPE_SERIALIZER.getKey(rec.getSerializer()) == null) {
                 Placebo.LOGGER.error("Attempted to add an invalid recipe {}.", rec);
                 Thread.dumpStack();
@@ -162,7 +162,7 @@ public final class RecipeHelper {
          * @see RecipeHelper#makeStack(Object) for the definition of stack-like.
          * @see RecipeHelper#createInput(String, boolean, Object...) for the definition of ingredient-like.
          */
-        public void addShapeless(Object output, Object... inputs) {
+    /*    public void addShapeless(Object output, Object... inputs) {
             ItemStack out = makeStack(output);
             this.addRecipe(new ShapelessRecipe(this.name(out), this.modid, CraftingBookCategory.MISC, out, createInput(this.modid, false, inputs)));
         }
@@ -177,7 +177,7 @@ public final class RecipeHelper {
          * @see RecipeHelper#createInput(String, boolean, Object...) for the definition of ingredient-like.
          * @throws UnsupportedOperationException if <code>width * height != input.length</code> (meaning not enough inputs).
          */
-        public void addShaped(Object output, int width, int height, Object... input) {
+   /*     public void addShaped(Object output, int width, int height, Object... input) {
             this.addRecipe(this.genShaped(makeStack(output), width, height, input));
         }
 
@@ -213,5 +213,5 @@ public final class RecipeHelper {
             totalRecipes = 0;
         }
     }
-
+*/
 }

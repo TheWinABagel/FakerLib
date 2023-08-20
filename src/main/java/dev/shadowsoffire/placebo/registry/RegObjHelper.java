@@ -79,10 +79,10 @@ public class RegObjHelper {
     public <U extends ParticleOptions, T extends ParticleType<U>> RegistryObject<T> particle(String path) {
         return create(this.modid, path, BuiltInRegistries.PARTICLE_TYPE);
     }
-/*
+
     public <U extends AbstractContainerMenu, T extends MenuType<U>> RegistryObject<T> menu(String path) {
-        return create(this.modid, path, BuiltInRegistries.MENU_TYPE);
-    }*/
+        return create(this.modid, path, BuiltInRegistries.MENU);
+    }
 
     public <T extends PaintingVariant> RegistryObject<T> painting(String path) {
         return create(this.modid, path, BuiltInRegistries.PAINTING_VARIANT);

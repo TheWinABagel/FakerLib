@@ -51,8 +51,9 @@ public class PlaceboUtil {
 
     public static ItemStack[] toStackArray(Object... args) {
         ItemStack[] out = new ItemStack[args.length];
-        for (int i = 0; i < args.length; i++)
-            out[i] = RecipeHelper.makeStack(args[i]);
+        for (int i = 0; i < args.length; i++) {
+            //     out[i] = RecipeHelper.makeStack(args[i]);
+        }
         return out;
     }
 

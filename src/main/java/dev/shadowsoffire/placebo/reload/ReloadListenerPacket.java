@@ -181,6 +181,7 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
             FriendlyByteBuf buf = PacketByteBufs.create();
             buf.writeUtf(path, 50);
             ServerPlayNetworking.send(player, ID, buf);
+            SyncManagement.endSync(path);
         }
 
     }

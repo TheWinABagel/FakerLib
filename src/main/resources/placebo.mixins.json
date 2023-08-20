@@ -6,7 +6,9 @@
     "AbstractContainerMenuInvoker",
     "AnvilBlockMixin",
     "ItemStackMixin",
-    "LootTablesMixin"
+    "LootTablesMixin",
+    "ReloadableServerResourcesMixin",
+    "ServerResourcesMixin"
   ],
   "injectors": {
     "defaultRequire": 1

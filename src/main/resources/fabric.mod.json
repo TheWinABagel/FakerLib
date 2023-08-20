@@ -2,10 +2,11 @@
 	"schemaVersion": 1,
 	"id": "placebo",
 	"version": "${version}",
-	"name": "placebo",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "fakerlib",
+	"description": "Library mod for Zenith",
 	"authors": [
-		"Me!"
+		"ShadowsOfFire (forge version)",
+		"TheWinABagel"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
@@ -29,7 +30,7 @@
 		"fabricloader": ">=0.14.22",
 		"minecraft": "~1.20.1",
 		"java": ">=17",
-		"fabric-api": "*"
+		"fabric-api": ">=0.87.0"
 	},
 	"suggests": {
 		"another-mod": "*"

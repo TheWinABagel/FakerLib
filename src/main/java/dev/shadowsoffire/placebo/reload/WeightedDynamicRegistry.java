@@ -24,7 +24,7 @@ import java.util.function.Predicate;
  *
  * @param <V>
  */
-public abstract class WeightedDynamicRegistry<V extends TypeKeyed & PSerializable<? super V> & ILuckyWeighted> extends DynamicRegistry<V> {
+public abstract class WeightedDynamicRegistry<V extends PSerializable<? super V> & ILuckyWeighted> extends DynamicRegistry<V> {
 
     protected List<Wrapper<V>> zeroLuckList = Collections.emptyList();
     protected int zeroLuckTotalWeight = 0;
@@ -41,8 +41,8 @@ public abstract class WeightedDynamicRegistry<V extends TypeKeyed & PSerializabl
     }
 
     @Override
-    protected void validateItem(V item) {
-        super.validateItem(item);
+    protected void validateItem(ResourceLocation key, V item) {
+        super.validateItem(key, item);
         Preconditions.checkArgument(item.getQuality() >= 0, "Item may not have negative quality!");
         Preconditions.checkArgument(item.getWeight() >= 0, "Item may not have negative weight!");
     }

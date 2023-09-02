@@ -56,23 +56,9 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
             ServerPlayNetworking.send(player, ID, buf);
         }
 
-
-        /*
-            public void write(Start msg, FriendlyByteBuf buf) {
-                buf.writeUtf(msg.path, 50);
-            }
-
-            public Start read(FriendlyByteBuf buf) {
-                return new Start(buf.readUtf(50));
-            }
-
-            public void handle(Start msg) {
-                SyncManagement.initSync(msg.path);
-            }
-        */
     }
 
-    public static class Content<V extends TypeKeyed & PSerializable<? super V>> extends ReloadListenerPacket<Content<V>> {
+    public static class Content<V extends PSerializable<? super V>> extends ReloadListenerPacket<Content<V>> {
         public static ResourceLocation ID = new ResourceLocation(Placebo.MODID, "reload_listener_content");
         final ResourceLocation key;
         final Either<V, FriendlyByteBuf> data;
@@ -92,7 +78,7 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
         private V readItem() {
             FriendlyByteBuf buf = this.data.right().get();
             try {
-                return SyncManagement.readItem(path, key, buf);
+                return SyncManagement.readItem(path, buf);
             } catch (Exception ex) {
                 Placebo.LOGGER.error("Failure when deserializing a dynamic registry object via network: Registry: {}, Object ID: {}", path, key);
                 ex.printStackTrace();
@@ -102,7 +88,8 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
             }
         }
 
-        public static class Provider<V extends TypeKeyed & PSerializable<? super V>> {
+        public static class Provider<V extends PSerializable<? super V>> {
+
 
             public void write(Content<V> msg, FriendlyByteBuf buf) {
                 buf.writeUtf(msg.path, 50);
@@ -117,28 +104,28 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
             }
 
             public void handle(Content<V> msg) {
-                SyncManagement.acceptItem(msg.path, msg.readItem());
+                SyncManagement.acceptItem(msg.path, msg.key, msg.readItem());
 
             }
 
-            public static <V extends TypeKeyed> void init() {
+            public static <V> void init() {
                 ClientPlayNetworking.registerGlobalReceiver(ID, ((client, handler, buf, responseSender) -> {
                     String path = buf.readUtf(50);
                     ResourceLocation key = buf.readResourceLocation();
-                    V item = SyncManagement.readItem(path, key, buf);
-                    SyncManagement.acceptItem(path, item);
+                    V item = SyncManagement.readItem(path, buf);
+                    SyncManagement.acceptItem(path, key, item);
                 }));
             }
 
-            public static <V extends TypeKeyed & PSerializable<? super V>> void sendTo(ServerPlayer player, String path, ResourceLocation k, V v) {
+            public static <R extends PSerializable<? super R>> void sendTo(ServerPlayer player, String path, ResourceLocation k, R v) {
                 FriendlyByteBuf buf = PacketByteBufs.create();
                 buf.writeUtf(path, 50);
                 buf.writeResourceLocation(k);
-                SyncManagement.writeItem(path, v, buf); //TODO might not work idfk
+                SyncManagement.writeItem(path, v, buf);
                 ServerPlayNetworking.send(player, ID, buf);
             }
 
-            public static <V extends TypeKeyed & PSerializable<? super V>> void sendToAll(String path, ResourceLocation k, V v) {
+            public static <R extends PSerializable<? super R>> void sendToAll(String path, ResourceLocation k, R v) {
                 if (ServerEvents.getCurrentServer() != null) {
                     List<ServerPlayer> list = ServerEvents.getCurrentServer().getPlayerList().getPlayers();
                     for (ServerPlayer p : list) {

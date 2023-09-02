@@ -9,6 +9,7 @@ import dev.shadowsoffire.placebo.json.JsonUtil.JsonDeserializer;
 import dev.shadowsoffire.placebo.json.JsonUtil.JsonSerializer;
 import dev.shadowsoffire.placebo.json.JsonUtil.NetDeserializer;
 import dev.shadowsoffire.placebo.json.JsonUtil.NetSerializer;
+import dev.shadowsoffire.placebo.codec.PlaceboCodecs.CodecProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.FriendlyByteBuf;
@@ -276,7 +277,8 @@ public class PSerializer<V> implements JsonDeserializer<V>, JsonSerializer<V>, N
     }
 
     /**
-     * An interface supporting Serializers with generic types.
+     * An interface which forces objects to provide their serializer.<br>
+     * This would just be replaced with {@link CodecProvider}, but {@link PSerializer} supports separate json and network codecs.
      *
      * @param <V> This
      */
@@ -284,7 +286,7 @@ public class PSerializer<V> implements JsonDeserializer<V>, JsonSerializer<V>, N
 
         /**
          * Returns the serializer that is responsible for de/serializing this object.<br>
-         * If this object is subtyped (i.e. is backed by a {@link SerializerMap}, the returned serializer should be registered.
+         * The returned serializer should be registered with the owning registry.
          */
         PSerializer<? extends V> getSerializer();
     }

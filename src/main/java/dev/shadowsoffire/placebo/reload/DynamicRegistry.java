@@ -5,7 +5,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableBiMap;
+import com.mojang.serialization.Codec;
 import dev.shadowsoffire.placebo.Placebo;
+import dev.shadowsoffire.placebo.events.ReloadableServerEvent;
 import dev.shadowsoffire.placebo.json.JsonUtil;
 import dev.shadowsoffire.placebo.json.PSerializer;
 import dev.shadowsoffire.placebo.json.PSerializer.PSerializable;
@@ -28,7 +33,6 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,12 +48,12 @@ import static dev.shadowsoffire.placebo.reload.DynamicRegistry.SyncManagement.sy
  * Then, create a single static instance of it and keep it around.
  * <p>
  * You will provide your serializers via {@link #registerBuiltinSerializers()}.<br>
- * You will then need to register it via {@link #registerToBus()}.<br>
+ * You will then need to register it via {@link #register()}.<br>
  * From then on, loading of files, condition checks, network sync, and everything else is automatically handled.
  *
  * @param <R> The base type of objects stored in this registry.
  */
-public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? super R>> extends SimpleJsonResourceReloadListener {
+public abstract class DynamicRegistry<R extends PSerializable<? super R>> extends SimpleJsonResourceReloadListener {
 
     /**
      * The default serializer key that is used when subtypes are not enabled.
@@ -61,13 +65,14 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
     protected final boolean synced;
     protected final boolean subtypes;
     protected final SerializerMap<R> serializers;
+    protected final Codec<DynamicHolder<R>> holderCodec;
 
     /**
      * Internal registry. Immutable when outside of the registration phase.
      * <p>
      * This map is cleared in {@link #beginReload()} and frozen in {@link #onReload()}
      */
-    protected Map<ResourceLocation, R> registry = ImmutableMap.of();
+    protected BiMap<ResourceLocation, R> registry = ImmutableBiMap.of();
 
     /**
      * Staged data used during the sync process. Discarded when running an integrated server.
@@ -100,7 +105,7 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
      * @param path     The datapack path used by this listener for loading files.
      * @param synced   If this listener will be synced over the network.
      * @param subtypes If this listener supports subtyped objects (and the "type" key on top-level objects).
-     * @apiNote After construction, {@link #registerToBus()} must be called during setup.
+     * @apiNote After construction, {@link #register()} must be called during setup.
      */
     public DynamicRegistry(Logger logger, String path, boolean synced, boolean subtypes) {
         super(new GsonBuilder().setLenient().create(), path);
@@ -111,6 +116,7 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
         this.serializers = new SerializerMap<>(path);
         this.registerBuiltinSerializers();
         if (this.serializers.isEmpty()) throw new RuntimeException("Attempted to create a json reload listener for " + path + " with no built-in serializers!");
+        this.holderCodec = ResourceLocation.CODEC.xmap(this::holder, DynamicHolder::getId);
     }
 
     /**
@@ -137,8 +143,6 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
                     else {
                         deserialized = this.serializers.get(DEFAULT).read(obj);
                     }
-                    deserialized.setId(key);
-                    Preconditions.checkNotNull(deserialized.getId(), "A " + this.path + " with id " + key + " failed to set ID.");
                     Preconditions.checkNotNull(deserialized.getSerializer(), "A " + this.path + " with id " + key + " is not declaring a serializer.");
                     Preconditions.checkNotNull(this.serializers.get(deserialized.getSerializer()), "A " + this.path + " with id " + key + " is declaring an unregistered serializer.");
                     this.register(key, deserialized);
@@ -150,7 +154,6 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
             }
         });
         this.onReload();
-        Placebo.LOGGER.error("DynamicRegistry apply");
     }
 
     /**
@@ -165,7 +168,7 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
      */
     protected void beginReload() {
         this.callbacks.forEach(l -> l.beginReload(this));
-        this.registry = new HashMap<>();
+        this.registry = HashBiMap.create();
         this.holders.values().forEach(DynamicHolder::unbind);
     }
 
@@ -174,7 +177,7 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
      * Should handle any info logging, and data immutability.
      */
     protected void onReload() {
-        this.registry = ImmutableMap.copyOf(this.registry);
+        this.registry = ImmutableBiMap.copyOf(this.registry);
         this.logger.info("Registered {} {}.", this.registry.size(), this.path);
         this.callbacks.forEach(l -> l.onReload(this));
         this.holders.values().forEach(DynamicHolder::bind);
@@ -199,7 +202,15 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
      */
     @Nullable
     public R getValue(ResourceLocation key) {
-        return this.getOrDefault(key, null);
+        return this.registry.get(key);
+    }
+
+    /**
+     * @return The key associated with this value, or null.
+     */
+    @Nullable
+    public ResourceLocation getKey(R value) {
+        return this.registry.inverse().get(value);
     }
 
     /**
@@ -213,12 +224,11 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
      * Registers this listener to the event bus as is appropriate.
      * This should be called for ALL listeners from common setup.
      */
-    public void registerToBus() {
+    public void register() {
         if (this.synced) SyncManagement.registerForSync(this);
-         //TODO make this do something
+        ReloadableServerEvent.addListeners(this);
     }
     public static void sync(){
-        Placebo.LOGGER.error("DynamicRegistry sync()");
         syncAll();
     }
 
@@ -235,23 +245,35 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
     }
 
     /**
-     * Gets the {@link DynamicHolder} associated with a particular value.
+     * Gets the {@link DynamicHolder} associated with a particular value if it exists.
+     * <p>
+     * If the value is not present in the registry, instead returns {@linkplain #emptyHolder() the empty holder}.
      * 
      * @see #holder(ResourceLocation)
      */
-    @SuppressWarnings("unchecked")
     public <T extends R> DynamicHolder<T> holder(T t) {
-        return (DynamicHolder<T>) this.holders.computeIfAbsent(t.getId(), k -> new DynamicHolder<>(this, k));
+        ResourceLocation key = getKey(t);
+        return holder(key == null ? DynamicHolder.EMPTY : key);
     }
 
     /**
-     * Gets an empty {@link DynamicHolder}.
+     * Gets the empty {@link DynamicHolder}.
      * 
      * @see #holder(ResourceLocation)
      */
     @SuppressWarnings("unchecked")
     public DynamicHolder<R> emptyHolder() {
-        return (DynamicHolder<R>) this.holders.computeIfAbsent(DynamicHolder.EMPTY, k -> new DynamicHolder<>(this, k));
+        return holder(DynamicHolder.EMPTY);
+    }
+
+    /**
+     * Returns a {@link Codec} that can handle {@link DynamicHolder}s for this registry.<br>
+     * The serialized form is {@link ResourceLocation}.
+     *
+     * @return The Dynamic Holder Codec for this registry.
+     */
+    public Codec<DynamicHolder<R>> holderCodec() {
+        return this.holderCodec;
     }
 
     /**
@@ -290,18 +312,16 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
     /**
      * Registers a single item of this type to the registry during reload.
      * <p>
-     * Override {@link #validateItem(TypeKeyed)} to perform additional validation of registered objects.
+     * Override {@link #validateItem} to perform additional validation of registered objects.
      *
-     * @param key  The key of the object being registered.
-     * @param item The object being registered.
-     * @throws UnsupportedOperationException if the key does not match {@link TypeKeyed#getId() the item's key}
+     * @param key   The key of the value being registered.
+     * param value The value being registered.
      * @throws UnsupportedOperationException if the key is already in use.
      */
-    protected final void register(ResourceLocation key, R item) {
-        if (!key.equals(item.getId())) throw new UnsupportedOperationException("Attempted to register a " + this.path + " with a mismatched registry ID! Expected: " + item.getId() + " Provided: " + key);
+    protected final void register(ResourceLocation key, R value) {
         if (this.registry.containsKey(key)) throw new UnsupportedOperationException("Attempted to register a " + this.path + " with a duplicate registry ID! Key: " + key);
-        this.validateItem(item);
-        this.registry.put(key, item);
+        this.validateItem(key, value);
+        this.registry.put(key, value);
         this.holders.computeIfAbsent(key, k -> new DynamicHolder<>(this, k));
     }
 
@@ -309,19 +329,10 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
      * Validates that an individual item meets any criteria set by this reload listener.<br>
      * Called just before insertion into the registry.
      *
-     * @param item The item about to be registered.
+     * @param key   The key of the value being registered.
+     * @param value The value being registered.
      */
-    protected void validateItem(R item) {}
-
-
-
-    /**
-     * Adds this reload listener to the {@link ReloadableServerResources}.<br>
-     */
-    public List<PreparableReloadListener> addReloader(List<PreparableReloadListener> listeners) {
-        listeners.add(this);
-        return listeners;
-    }
+    protected void validateItem(ResourceLocation key, R value) {}
 
     /**
      * Replaces the contents of the live registry with the staging registry.<br>
@@ -335,24 +346,19 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
         this.onReload();
     }
     ResourceLocation id = new ResourceLocation(Placebo.MODID, "packet");
+
     /**
      * Sync event handler. Sends the start packet, a content packet for each item, and then the end packet.
      */
-    private void sync(Player player) { //TODO double check this all works
-        //PacketTarget target = player == null ? PacketDistributor.ALL.noArg() : PacketDistributor.PLAYER.with(() -> player);
-        Placebo.LOGGER.error("Dynamic Registry sync()");
+    private void sync(Player player) {
         ServerPlayer sp = (ServerPlayer) player;
-        player.displayClientMessage(Component.literal("THIS IS A TEST "), false);
         if (player == null) {
-            Placebo.LOGGER.error("Dynamic Registry sync() player==null");
             ReloadListenerPacket.Start.sendToAll(this.path);
             this.registry.forEach((k, v) -> {
                 ReloadListenerPacket.Content.Provider.sendToAll(this.path, k, v);
             });
             ReloadListenerPacket.End.sendToAll(this.path);
         } else {
-            sp.displayClientMessage(Component.literal("TESTCLIENTMESSAGE"), false);
-            Placebo.LOGGER.error("Dynamic Registry sync() player!==null");
             ReloadListenerPacket.Start.sendTo(sp, this.path);
             this.registry.forEach((k, v) -> {
                 ReloadListenerPacket.Content.Provider.sendTo(sp, this.path, k, v);
@@ -363,8 +369,6 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
         ServerPlayNetworking.createS2CPacket(id, buf);
         ReloadListenerPacket.Start.init(sp, this.path);
         ReloadListenerPacket.Content.Provider.init();
-    //    Placebo.CHANNEL.sendToClient(new ReloadListenerPacket.Start(this.path), sp);
-    //    Placebo.CHANNEL.send(sp, new ReloadListenerPacket.End(this.path));
     }
 
     /**
@@ -386,11 +390,7 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
             if (!listener.synced) throw new UnsupportedOperationException("Attempted to register the non-synced JSON Reload Listener " + listener.path + " as a synced listener!");
             synchronized (SYNC_REGISTRY) {
                 if (SYNC_REGISTRY.containsKey(listener.path)) throw new UnsupportedOperationException("Attempted to register the JSON Reload Listener for syncing " + listener.path + " but one already exists!");
-                if (SYNC_REGISTRY.isEmpty()){
-                    Placebo.LOGGER.error("syncAll is being called from registerForSync");
-                    syncAll();
-                }
-                Placebo.LOGGER.error("putting listener in sync registry");
+                if (SYNC_REGISTRY.isEmpty()) syncAll();
                 SYNC_REGISTRY.put(listener.path, listener);
             }
         }
@@ -404,7 +404,6 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
             ifPresent(path, (k, v) -> {
                 v.staged.clear();
             });
-            Placebo.LOGGER.info("Starting sync for {}", path);
         }
 
         /**
@@ -416,7 +415,7 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
          * @param buf   The buffer being written to.
          */
         @SuppressWarnings("unchecked")
-        static <V extends TypeKeyed & PSerializable<? super V>> void writeItem(String path, V value, FriendlyByteBuf buf) {
+        static <V extends PSerializable<? super V>> void writeItem(String path, V value, FriendlyByteBuf buf) {
             ifPresent(path, (k, v) -> {
                 ((SerializerMap<V>) v.serializers).write(value, buf);
             });
@@ -427,16 +426,14 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
          *
          * @param <V>  The type of item being read.
          * @param path The path of the listener.
-         * @param key  The key of the item being read (not the serializer key).
          * @param buf  The buffer being read from.
          * @return An object of type V as deserialized from the network.
          */
         @SuppressWarnings("unchecked")
-        static <V extends TypeKeyed> V readItem(String path, ResourceLocation key, FriendlyByteBuf buf) {
+        static <V> V readItem(String path, FriendlyByteBuf buf) {
             var listener = SYNC_REGISTRY.get(path);
             if (listener == null) throw new RuntimeException("Received sync packet for unknown registry!");
             V v = (V) listener.serializers.read(buf);
-            v.setId(key);
             return v;
         }
 
@@ -448,9 +445,9 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
          * @param value The object being staged.
          */
         @SuppressWarnings("unchecked")
-        static <V extends TypeKeyed> void acceptItem(String path, V value) {
+        static <V> void acceptItem(String path, ResourceLocation key, V value) {
             ifPresent(path, (k, v) -> {
-                ((Map<ResourceLocation, V>) v.staged).put(value.getId(), value);
+                ((Map<ResourceLocation, V>) v.staged).put(key, value);
             });
         }
 
@@ -478,8 +475,6 @@ public abstract class DynamicRegistry<R extends TypeKeyed & PSerializable<? supe
 
         public static void syncAll() {
             ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
-                Placebo.LOGGER.error("DynamicRegistry syncAll()");
-                player.displayClientMessage(Component.literal("Player :" + player +" has arrrived!"), false);
                 SYNC_REGISTRY.values().forEach(r -> r.sync(player));
             });
         }

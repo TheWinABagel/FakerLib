@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  *
  * @param <T> The type of the target value.
  */
-public class DynamicHolder<T extends TypeKeyed & PSerializable<? super T>> implements Supplier<T> {
+public class DynamicHolder<T> implements Supplier<T> {
 
     /**
      * The ID of an "empty" holder.

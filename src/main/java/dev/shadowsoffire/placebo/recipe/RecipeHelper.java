@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import dev.shadowsoffire.placebo.Placebo;
 import dev.shadowsoffire.placebo.util.RunnableReloader;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -22,13 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-/**
- * This class is support for adding code recipes.
- * <p>
- * To add recipes, you register a provider which will be invoked during resource reload.
- *
- * @see {@link RecipeHelper#registerProvider(Consumer)}.
- */
 @Deprecated // Go use a json
 public final class RecipeHelper {
 /*
@@ -65,10 +59,10 @@ public final class RecipeHelper {
      * @return An ItemStack representing <code>thing</code>.
      * @throws IllegalArgumentException if <code>thing</code> is not a valid type.
      */
-    /*public static ItemStack makeStack(Object thing) {
+    public static ItemStack makeStack(Object thing) {
         if (thing instanceof ItemStack stack) return stack;
         if (thing instanceof ItemLike il) return new ItemStack(il);
-        //if (thing instanceof RegistryObject<?> ro) return new ItemStack((ItemLike) ro.get());
+        if (thing instanceof RegistryObject<?> ro) return new ItemStack((ItemLike) ro.get());
         throw new IllegalArgumentException("Attempted to create an ItemStack from something that cannot be converted: " + thing);
     }
 
@@ -85,7 +79,7 @@ public final class RecipeHelper {
      * @param inputArr   An array of potential input objects that are in-order.
      * @return A list of ingredients for a recipe.
      */
-  /*  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({ "rawtypes", "unchecked" })
     public static NonNullList<Ingredient> createInput(String modid, boolean allowEmpty, Object... inputArr) {
         NonNullList<Ingredient> inputL = NonNullList.create();
         for (int i = 0; i < inputArr.length; i++) {
@@ -93,7 +87,7 @@ public final class RecipeHelper {
             if (input instanceof TagKey tag) inputL.add(i, Ingredient.of(tag));
             else if (input instanceof String str) inputL.add(i, Ingredient.of(TagKey.create(Registries.ITEM, new ResourceLocation(str))));
             else if (input instanceof ItemStack stack && !stack.isEmpty()) inputL.add(i, Ingredient.of(stack));
-            //else if (input instanceof ItemLike || input instanceof RegistryObject) inputL.add(i, Ingredient.of(makeStack(input)));
+            else if (input instanceof ItemLike || input instanceof RegistryObject) inputL.add(i, Ingredient.of(makeStack(input)));
             else if (input instanceof Ingredient ing) inputL.add(i, ing);
             else if (allowEmpty) inputL.add(i, Ingredient.EMPTY);
             else throw new UnsupportedOperationException("Attempted to add invalid recipe.  Complain to the author of " + modid + ". (Input " + input + " not allowed.)");

@@ -23,7 +23,7 @@ public class Placebo implements ModInitializer {
 
     public static final String MODID = "fakerlib";
     public static final Logger LOGGER = LogManager.getLogger(MODID);
-
+    public static boolean Debug = true;
     @Override
     public void onInitialize() {
         //TextColor.NAMED_COLORS = new HashMap<>(TextColor.NAMED_COLORS);
@@ -33,14 +33,13 @@ public class Placebo implements ModInitializer {
         registerCommands();
         PlaceboUtil.registerCustomColor(GradientColor.RAINBOW);
         DynamicRegistry.sync();
-    //    MessageHelper.registerMessage(CHANNEL, 3, new ReloadListenerPacket.Content<>());
-    //    MessageHelper.registerMessage(CHANNEL, 4, new ReloadListenerPacket.End());
+
     }
 
 
     public void registerCommands() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            PlaceboCommand.register(dispatcher);
+            PlaceboCommand.register(dispatcher, registryAccess);
         });
     }
 

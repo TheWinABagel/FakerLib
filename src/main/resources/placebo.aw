@@ -1,5 +1,7 @@
 accessWidener   v1  named
 
+accessible field net/minecraft/server/ReloadableServerResources commandBuildContext Lnet/minecraft/commands/CommandBuildContext$Configurable;
+
 extendable class net/minecraft/network/chat/TextColor
 accessible class net/minecraft/network/chat/TextColor
 accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier

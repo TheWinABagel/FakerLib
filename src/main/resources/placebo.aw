@@ -1,11 +1,12 @@
-accessWidener   v1  named
-
-accessible field net/minecraft/server/ReloadableServerResources commandBuildContext Lnet/minecraft/commands/CommandBuildContext$Configurable;
+accessWidener  v1  named
 
 extendable class net/minecraft/network/chat/TextColor
 accessible class net/minecraft/network/chat/TextColor
+accessible method net/minecraft/network/chat/TextColor <init> (I)V
+accessible field net/minecraft/server/ReloadableServerResources commandBuildContext Lnet/minecraft/commands/CommandBuildContext$Configurable;
 accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
 accessible method net/minecraft/network/chat/TextColor <init> (ILjava/lang/String;)V
+mutable field net/minecraft/network/chat/TextColor NAMED_COLORS Ljava/util/Map;
 accessible field net/minecraft/network/chat/TextColor NAMED_COLORS Ljava/util/Map;
 accessible field net/minecraft/world/level/block/state/StateDefinition owner Ljava/lang/Object;
 accessible field net/minecraft/world/item/crafting/RecipeManager byName Ljava/util/Map;

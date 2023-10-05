@@ -6,6 +6,8 @@ import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
+import java.util.Arrays;
+
 public class PoolBuilder extends LootPool.Builder {
 
     static int k = 0;
@@ -16,20 +18,17 @@ public class PoolBuilder extends LootPool.Builder {
     }
 
     public PoolBuilder addEntries(LootPoolEntryContainer... entries) {
-        for (LootPoolEntryContainer e : entries)
-            this.entries.add(e);
+        this.entries.addAll(Arrays.asList(entries));
         return this;
     }
 
     public PoolBuilder addCondition(LootItemCondition... conditions) {
-        for (LootItemCondition c : conditions)
-            this.conditions.add(c);
+        this.conditions.addAll(Arrays.asList(conditions));
         return this;
     }
 
     public PoolBuilder addFunc(LootItemFunction... conditions) {
-        for (LootItemFunction c : conditions)
-            this.functions.add(c);
+        this.functions.addAll(Arrays.asList(conditions));
         return this;
     }
 

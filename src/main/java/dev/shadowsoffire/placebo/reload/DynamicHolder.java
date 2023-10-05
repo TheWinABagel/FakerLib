@@ -1,6 +1,5 @@
 package dev.shadowsoffire.placebo.reload;
 
-import dev.shadowsoffire.placebo.json.PSerializer.PSerializable;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;

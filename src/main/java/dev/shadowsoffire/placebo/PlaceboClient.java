@@ -1,13 +1,10 @@
 package dev.shadowsoffire.placebo;
 
-import dev.shadowsoffire.placebo.color.GradientColor;
-import dev.shadowsoffire.placebo.util.PlaceboUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextColor;
 
 @Environment(EnvType.CLIENT)
 public class PlaceboClient implements ClientModInitializer {
@@ -20,15 +17,6 @@ public class PlaceboClient implements ClientModInitializer {
     }
 
 
-
-    /**
-     * see PlaceboUtil#registerCustomColor(String, TextColor)
-     */
-    @Deprecated(forRemoval = true)
-    public static <T extends TextColor> void registerCustomColor(String id, T color) {
-        PlaceboUtil.registerCustomColor(color);
-    }
-
     public static long ticks = 0;
 
 
@@ -37,11 +25,4 @@ public class PlaceboClient implements ClientModInitializer {
     }
 
 
-    @Deprecated(forRemoval = true)
-    public static class RainbowColor extends GradientColor {
-
-        public RainbowColor() {
-            super(GradientColor.RAINBOW_GRADIENT, "rainbow");
-        }
-    }
 }

@@ -2,10 +2,9 @@ package dev.shadowsoffire.placebo.reload;
 
 import com.mojang.datafixers.util.Either;
 import dev.shadowsoffire.placebo.Placebo;
-import dev.shadowsoffire.placebo.cap.InternalItemHandler;
 import dev.shadowsoffire.placebo.events.ServerEvents;
-import dev.shadowsoffire.placebo.json.PSerializer.PSerializable;
 
+import dev.shadowsoffire.placebo.codec.CodecProvider;
 import dev.shadowsoffire.placebo.reload.DynamicRegistry.SyncManagement;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -16,7 +15,6 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 @ApiStatus.Internal
 public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
@@ -58,7 +56,7 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
 
     }
 
-    public static class Content<V extends PSerializable<? super V>> extends ReloadListenerPacket<Content<V>> {
+    public static class Content<V extends CodecProvider<? super V>> extends ReloadListenerPacket<Content<V>> {
         public static ResourceLocation ID = new ResourceLocation(Placebo.MODID, "reload_listener_content");
         final ResourceLocation key;
         final Either<V, FriendlyByteBuf> data;
@@ -88,7 +86,7 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
             }
         }
 
-        public static class Provider<V extends PSerializable<? super V>> {
+        public static class Provider<V extends CodecProvider<? super V>> {
 
 
             public void write(Content<V> msg, FriendlyByteBuf buf) {
@@ -117,7 +115,7 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
                 }));
             }
 
-            public static <R extends PSerializable<? super R>> void sendTo(ServerPlayer player, String path, ResourceLocation k, R v) {
+            public static <R extends CodecProvider<? super R>> void sendTo(ServerPlayer player, String path, ResourceLocation k, R v) {
                 FriendlyByteBuf buf = PacketByteBufs.create();
                 buf.writeUtf(path, 50);
                 buf.writeResourceLocation(k);
@@ -125,7 +123,7 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
                 ServerPlayNetworking.send(player, ID, buf);
             }
 
-            public static <R extends PSerializable<? super R>> void sendToAll(String path, ResourceLocation k, R v) {
+            public static <R extends CodecProvider<? super R>> void sendToAll(String path, ResourceLocation k, R v) {
                 if (ServerEvents.getCurrentServer() != null) {
                     List<ServerPlayer> list = ServerEvents.getCurrentServer().getPlayerList().getPlayers();
                     for (ServerPlayer p : list) {

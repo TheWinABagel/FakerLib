@@ -25,7 +25,7 @@ public class LootTablesMixin {
     private Map<LootDataId<?>, ?> elements;
     @Shadow
     private Multimap<LootDataType<?>, ResourceLocation> typeKeys;
-
+    /*
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Inject(method = "apply(Ljava/util/Map;)V", at = @At(value = "TAIL"), require = 1)
     protected void apply(Map<ResourceLocation, JsonElement> pObject, CallbackInfo ci) {
@@ -39,5 +39,5 @@ public class LootTablesMixin {
             }
         });
         Placebo.LOGGER.info("Registered {} additional loot tables.", LootSystem.PLACEBO_TABLES.size());
-    }
+    }*/
 }

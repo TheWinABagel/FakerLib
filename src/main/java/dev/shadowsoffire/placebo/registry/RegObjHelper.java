@@ -112,6 +112,7 @@ public class RegObjHelper {
         return create(this.modid, path, registry);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> RegistryObject<T> create(String modid, String path, Registry<? super T> registry) {
         return new RegistryObject(new ResourceLocation(modid, path.toLowerCase(Locale.ROOT)), registry.key());
     }

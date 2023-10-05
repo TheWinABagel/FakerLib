@@ -151,7 +151,7 @@ public class PlaceboUtil {
      * This is not required for any static color values, because they can be represented as a hex int.
      */
     public static <T extends TextColor> void registerCustomColor(T color) {
-    //    TextColor.NAMED_COLORS.put(color.serialize(), color); TODO fix colors
+        TextColor.NAMED_COLORS.put(color.serialize(), color);
     }
 
 }

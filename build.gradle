@@ -10,16 +10,6 @@ base {
 	archivesName = project.archives_base_name
 }
 
-subprojects {
-	loom {
-		silentMojangMappingsLicense()
-	}
-}
-
-loom {
-	accessWidenerPath = file("src/main/resources/placebo.aw")
-}
-
 repositories {
 	maven {
 		name = "Parchment"
@@ -36,6 +26,12 @@ repositories {
 			includeGroupByRegex "com.github.*"
 		}
 	}
+	maven {
+		url "https://maven.jamieswhiteshirt.com/libs-release"
+		content {
+			includeGroup "com.jamieswhiteshirt"
+		}
+	}
 }
 
 dependencies {
@@ -47,8 +43,14 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+	include modImplementation("com.jamieswhiteshirt:reach-entity-attributes:${project.reach_lib_version}")
+
 	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:Porting-Lib:${project.port_lib_version}"))
 	implementation annotationProcessor(include("com.github.LlamaLad7:MixinExtras:${project.mixin_extras_version}"))
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/placebo.aw")
 }
 
 processResources {

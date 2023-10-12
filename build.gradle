@@ -18,6 +18,9 @@ repositories {
 	maven {
 		name = "Porting Lib"
 		url = "https://mvn.devos.one/snapshots/"
+		content {
+
+		}
 	}
 	maven {
 		name = "mixin-extras"
@@ -43,14 +46,20 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	include modImplementation("com.jamieswhiteshirt:reach-entity-attributes:${project.reach_lib_version}")
+	modImplementation(include("com.jamieswhiteshirt:reach-entity-attributes:${project.reach_lib_version}"))
 
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:Porting-Lib:${project.port_lib_version}"))
-	implementation annotationProcessor(include("com.github.LlamaLad7:MixinExtras:${project.mixin_extras_version}"))
+	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:Porting-Lib:${project.port_lib_version}")) {
+		exclude(group: "io.github.fabricators_of_create.Porting-Lib", module: "networking")
+		exclude(group: "io.github.fabricators_of_create.Porting-Lib", module: "loot")
+	}
+
+	// Mixin Extras + Mixin^2 for mod compat
+	implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.2.0-beta.10"))
+	implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.0.2"))
 }
 
 loom {
-	accessWidenerPath = file("src/main/resources/placebo.aw")
+	accessWidenerPath = file("src/main/resources/fakerlib.aw")
 }
 
 processResources {

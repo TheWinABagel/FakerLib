@@ -1,0 +1,8 @@
+{
+	"key.categories.fakerlib": "Placebo",
+	"fakerlib.toggleTrails": "Перемкнути Patreon сліди",
+	"fakerlib.toggleWings": "Перемкнути Patreon крила",
+	"fakerlib.cmd.serialize_success": "Збережено %s у %s.",
+	"fakerlib.cmd.serialize_failure": "Сталася помилка у процесі серіалізації.",
+	"fakerlib.cmd.not_found": "%s не було знайдено."
+}

@@ -1,0 +1,8 @@
+{
+	"key.categories.fakerlib": "Placebo",
+	"fakerlib.toggleTrails": "Attiva/Disattiva Patreon Trails",
+	"fakerlib.toggleWings": "Attiva/Disattiva Patreon Wings",
+	"fakerlib.cmd.serialize_success": "Salvato %s in %s.",
+	"fakerlib.cmd.serialize_failure": "Si è verificato un errore durante il processo di serializzazione.",
+	"fakerlib.cmd.not_found": "%s non è stato trovato."
+}

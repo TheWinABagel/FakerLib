@@ -1,0 +1,8 @@
+{
+	"key.categories.fakerlib": "Placebo",
+	"fakerlib.toggleTrails": "Basculer les sentiers de Patreon",
+	"fakerlib.toggleWings": "Basculer les ailes Patreon",
+	"fakerlib.cmd.serialize_success": "Sauvegarde de %s dans %s.",
+	"fakerlib.cmd.serialize_failure": "Une erreur s'est produite lors du processus de sérialisation.",
+	"fakerlib.cmd.not_found": "%s n'a pas été trouvé."
+}

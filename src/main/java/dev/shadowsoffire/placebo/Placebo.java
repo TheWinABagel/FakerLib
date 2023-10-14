@@ -33,6 +33,7 @@ public class Placebo implements ModInitializer {
         PlaceboUtil.registerCustomColor(GradientColor.RAINBOW);
         DynamicRegistry.sync();
         GearSetRegistry.INSTANCE.register();
+        LOGGER.info("Look at the cleanse, look at the moves!");
     }
 
 

@@ -4,6 +4,7 @@ import dev.shadowsoffire.placebo.color.GradientColor;
 import dev.shadowsoffire.placebo.commands.PlaceboCommand;
 import dev.shadowsoffire.placebo.events.ServerEvents;
 import dev.shadowsoffire.placebo.json.GearSetRegistry;
+import dev.shadowsoffire.placebo.loot.StackLootEntry;
 import dev.shadowsoffire.placebo.packets.ButtonClickMessage;
 import dev.shadowsoffire.placebo.reload.DynamicRegistry;
 import dev.shadowsoffire.placebo.util.PlaceboTaskQueue;
@@ -34,6 +35,7 @@ public class Placebo implements ModInitializer {
         DynamicRegistry.sync();
         GearSetRegistry.INSTANCE.register();
         LOGGER.info("Look at the cleanse, look at the moves!");
+        StackLootEntry.poke();
     }
 
 

@@ -33,6 +33,7 @@ public class StackLootEntry extends LootPoolSingletonContainer {
     private final int min;
     private final int max;
 
+    public static void poke(){}
     public StackLootEntry(ItemStack stack, int min, int max, int weight, int quality, LootItemCondition[] conditions, LootItemFunction[] functions) {
         super(weight, quality, conditions, functions);
         this.stack = stack;

@@ -14,7 +14,7 @@ public class PoolBuilder extends LootPool.Builder {
 
     public PoolBuilder(int minRolls, int maxRolls) {
         this.setRolls(UniformGenerator.between(minRolls, maxRolls));
-    //     this.name("fakerlib_code_pool_" + k++); //TODO fix when porting lib loot works with stuff again
+    //     this.name("fakerlib_code_pool_" + k++);
     }
 
     public PoolBuilder addEntries(LootPoolEntryContainer... entries) {

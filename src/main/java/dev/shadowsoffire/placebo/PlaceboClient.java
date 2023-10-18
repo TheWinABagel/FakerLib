@@ -1,5 +1,6 @@
 package dev.shadowsoffire.placebo;
 
+import dev.shadowsoffire.placebo.reload.ReloadListenerPacket;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -14,6 +15,8 @@ public class PlaceboClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             ticks++;
         });
+        ReloadListenerPacket.Start.setup();
+        ReloadListenerPacket.Content.Provider.setup();
     }
 
 

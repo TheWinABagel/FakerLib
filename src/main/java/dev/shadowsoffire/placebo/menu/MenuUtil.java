@@ -1,7 +1,9 @@
 package dev.shadowsoffire.placebo.menu;
 
 import io.github.fabricators_of_create.porting_lib.util.NetworkHooks;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -34,6 +36,10 @@ public class MenuUtil {
      */
     public static <T extends AbstractContainerMenu> MenuType<T> posType(PosFactory<T> factory) {
         return new MenuType<>(factory(factory), FeatureFlags.DEFAULT_FLAGS);
+    }
+
+    public static <T extends AbstractContainerMenu> MenuType<T> extendedType(ExtFactory<T> factory) {
+        return new ExtendedScreenHandlerType<>(factory::create);
     }
 
     /**
@@ -78,8 +84,17 @@ public class MenuUtil {
         return (id, inv, buf) -> factory.create(id, inv, buf.readBlockPos());
     }
 
+    public static <T extends AbstractContainerMenu> IContainerFactory<T> factory(ExtFactory<T> factory) {
+        return factory::create;
+    }
+
     public static interface PosFactory<T> {
         T create(int id, Inventory pInv, BlockPos pos);
+    }
+
+    public static interface ExtFactory<T extends AbstractContainerMenu> {
+
+        T create(int syncId, Inventory inventory, FriendlyByteBuf buf);
     }
 
 }

@@ -11,9 +11,9 @@ import java.util.Map;
 public class PlaceboEventFactory {
 
     public static InteractionResult onItemUse(ItemStack stack, UseOnContext ctx) {
-        ItemUseEvent event = new ItemUseEvent(ctx);
-       /* MinecraftForge.EVENT_BUS.post(event);
-        if (event.isCanceled()) return event.getCancellationResult();*/
+        var event = new ItemUseEvent(ctx, stack);
+        boolean isCancelled = ItemUseEvent.ItemUse.ITEM_USE_EVENT.invoker().itemUse(event);
+        if (isCancelled) return event.cancellationResult;
         return null;
     }
 

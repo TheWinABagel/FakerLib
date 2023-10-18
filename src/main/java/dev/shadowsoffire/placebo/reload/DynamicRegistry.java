@@ -371,7 +371,6 @@ public abstract class DynamicRegistry<R extends CodecProvider<? super R>> extend
         FriendlyByteBuf buf = PacketByteBufs.create();
         ServerPlayNetworking.createS2CPacket(id, buf);
         ReloadListenerPacket.Start.init(sp, this.path);
-        ReloadListenerPacket.Content.Provider.init();
     }
 
     /**

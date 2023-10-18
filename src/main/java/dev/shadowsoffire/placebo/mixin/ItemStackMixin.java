@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -20,10 +21,11 @@ import java.util.function.ToIntFunction;
 @Mixin(ItemStack.class)
 public class ItemStackMixin implements CachedObjectSource {
 
+    @Unique
     private volatile Map<ResourceLocation, CachedObject<?>> cachedObjects = null;
 
     @Inject(at = @At("HEAD"), method = "useOn(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;", cancellable = true, require = 1)
-    public void placebo_itemUseHook(UseOnContext ctx, CallbackInfoReturnable<InteractionResult> cir) {
+    public void fakerlib_itemUseHook(UseOnContext ctx, CallbackInfoReturnable<InteractionResult> cir) {
         InteractionResult itemUseEventRes = PlaceboEventFactory.onItemUse((ItemStack) (Object) this, ctx);
         if (itemUseEventRes != null) cir.setReturnValue(itemUseEventRes);
     }
@@ -35,6 +37,7 @@ public class ItemStackMixin implements CachedObjectSource {
         return (T) cachedObj.get((ItemStack) (Object) this);
     }
 
+    @Unique
     private Map<ResourceLocation, CachedObject<?>> getOrCreate() {
         if (this.cachedObjects == null) {
             synchronized (this) {

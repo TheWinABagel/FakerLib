@@ -6,6 +6,8 @@ import dev.shadowsoffire.placebo.events.ServerEvents;
 
 import dev.shadowsoffire.placebo.codec.CodecProvider;
 import dev.shadowsoffire.placebo.reload.DynamicRegistry.SyncManagement;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -40,12 +42,15 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
         }
 
         public static void init(ServerPlayer player, String path) {
+            sendTo(player, path);
+        }
+
+        @Environment(EnvType.CLIENT)
+        public static void setup(){
             ClientPlayNetworking.registerGlobalReceiver(ID, ((client, handler, buf, responseSender) -> {
                 String msg = buf.readUtf(50);
                 SyncManagement.initSync(msg);
             }));
-            sendTo(player, path);
-
         }
 
         public static void sendTo(ServerPlayer player, String path) {
@@ -106,7 +111,8 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
 
             }
 
-            public static <V> void init() {
+            @Environment(EnvType.CLIENT)
+            public static <V> void setup(){
                 ClientPlayNetworking.registerGlobalReceiver(ID, ((client, handler, buf, responseSender) -> {
                     String path = buf.readUtf(50);
                     ResourceLocation key = buf.readResourceLocation();

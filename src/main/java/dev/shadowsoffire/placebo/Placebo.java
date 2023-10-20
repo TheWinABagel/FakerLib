@@ -5,14 +5,18 @@ import dev.shadowsoffire.placebo.commands.PlaceboCommand;
 import dev.shadowsoffire.placebo.events.ItemUseEvent;
 import dev.shadowsoffire.placebo.events.ServerEvents;
 import dev.shadowsoffire.placebo.json.GearSetRegistry;
+import dev.shadowsoffire.placebo.loot.DummyLootModifier;
 import dev.shadowsoffire.placebo.loot.StackLootEntry;
 import dev.shadowsoffire.placebo.packets.ButtonClickMessage;
 import dev.shadowsoffire.placebo.reload.DynamicRegistry;
 import dev.shadowsoffire.placebo.util.PlaceboTaskQueue;
 import dev.shadowsoffire.placebo.util.PlaceboUtil;
+import io.github.fabricators_of_create.porting_lib.loot.PortingLibLoot;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -40,6 +44,8 @@ public class Placebo implements ModInitializer {
         GearSetRegistry.INSTANCE.register();
         LOGGER.info("Look at the cleanse, look at the moves!");
         StackLootEntry.poke();
+        //This is to prevent potential issues with this registry not being registered for some reason, will be removed when fixed
+        Registry.register(PortingLibLoot.GLOBAL_LOOT_MODIFIER_SERIALIZERS.get(), new ResourceLocation(MODID, "dummy"), DummyLootModifier.CODEC);
     }
 
 

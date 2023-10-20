@@ -1,42 +1,38 @@
 package dev.shadowsoffire.placebo.events;
 
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Map;
 
 /**
  * This event is fired whenever the enchantment level of a particular item is requested for gameplay purposes.<br>
- * It is called from {@link IForgeItemStack#getEnchantmentLevel(Enchantment)} and {@link IForgeItemStack#getAllEnchantments()}.
+ * It is called from {@link net.minecraft.world.item.enchantment.EnchantmentHelper#getEnchantmentLevel(Enchantment, LivingEntity)} (Enchantment)} and {@link net.minecraft.world.item.enchantment.EnchantmentHelper#getEnchantments(ItemStack)}.
  * <p>
  * It is not fired for interactions with NBT, which means these changes will not reflect in the item tooltip.
  * <p>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  * This event is not cancellable.<br>
  * This event does not have a result.
  */
-public class GetEnchantmentLevelEvent  {
+public interface GetEnchantmentLevelEvent  {
 
-    protected final ItemStack stack;
-    protected final Map<Enchantment, Integer> enchantments;
 
-    public GetEnchantmentLevelEvent(ItemStack stack, Map<Enchantment, Integer> enchantments) {
-        this.stack = stack;
-        this.enchantments = enchantments;
-    }
+    Event<GetEnchantmentLevelEvent> GET_ENCHANTMENT_LEVEL = EventFactory.createArrayBacked(GetEnchantmentLevelEvent.class,
+            (listeners) -> (enchantments, stack) -> {
+                for (GetEnchantmentLevelEvent listener : listeners) {
+                    Map<Enchantment, Integer> result = listener.onEnchantRequest(enchantments, stack);
+                    return result;
+                }
 
-    /**
-     * Returns the item stack that is being queried.
-     */
-    public ItemStack getStack() {
-        return this.stack;
-    }
+                return enchantments;
+            });
 
-    /**
-     * Returns the mutable enchantment->level map.
-     */
-    public Map<Enchantment, Integer> getEnchantments() {
-        return this.enchantments;
-    }
-
+    Map<Enchantment, Integer> onEnchantRequest(Map<Enchantment, Integer> enchantments, ItemStack stack);
 }

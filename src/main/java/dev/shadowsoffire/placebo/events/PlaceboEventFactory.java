@@ -22,10 +22,10 @@ public class PlaceboEventFactory {
      * Injected via coremods/get_ench_level_event_specific.js
      */
     public static int getEnchantmentLevelSpecific(int level, ItemStack stack, Enchantment ench) {
-        var map = new HashMap<Enchantment, Integer>();
-        map.put(ench, level);
-        var event = new GetEnchantmentLevelEvent(stack, map);
-        return event.getEnchantments().get(ench);
+        var enchMap = new HashMap<Enchantment, Integer>();
+        enchMap.put(ench, level);
+        var eventResult = GetEnchantmentLevelEvent.GET_ENCHANTMENT_LEVEL.invoker().onEnchantRequest(enchMap, stack);
+        return eventResult.get(ench);
     }
 
     /**
@@ -34,7 +34,7 @@ public class PlaceboEventFactory {
      */
     public static Map<Enchantment, Integer> getEnchantmentLevel(Map<Enchantment, Integer> enchantments, ItemStack stack) {
         enchantments = new HashMap<>(enchantments);
-        var event = new GetEnchantmentLevelEvent(stack, enchantments);
+        GetEnchantmentLevelEvent.GET_ENCHANTMENT_LEVEL.invoker().onEnchantRequest(enchantments, stack);
         return enchantments;
     }
 }

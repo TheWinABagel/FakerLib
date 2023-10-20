@@ -5,6 +5,7 @@
   "mixins": [
     "AbstractContainerMenuInvoker",
     "AnvilBlockMixin",
+    "EnchantmentHelperMixin",
     "ItemStackMixin",
     "LootTablesMixin",
     "ReloadableServerResourcesMixin",

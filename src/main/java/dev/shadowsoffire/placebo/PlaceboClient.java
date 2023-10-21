@@ -16,7 +16,8 @@ public class PlaceboClient implements ClientModInitializer {
             ticks++;
         });
         ReloadListenerPacket.Start.setup();
-        ReloadListenerPacket.Content.Provider.setup();
+        ReloadListenerPacket.Content.setup();
+        ReloadListenerPacket.End.setup();
     }
 
 

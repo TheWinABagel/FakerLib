@@ -79,7 +79,7 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
         }
 
         private V readItem() {
-            FriendlyByteBuf buf = this.data.right().get();
+                FriendlyByteBuf buf = this.data.right().get();
             try {
                 return SyncManagement.readItem(path, buf);
             } catch (Exception ex) {
@@ -91,35 +91,17 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
             }
         }
 
-        public static class Provider<V extends CodecProvider<? super V>> {
-
-
-            public void write(Content<V> msg, FriendlyByteBuf buf) {
-                buf.writeUtf(msg.path, 50);
-                buf.writeResourceLocation(msg.key);
-                SyncManagement.writeItem(msg.path, msg.data.left().get(), buf);
-            }
-
-            public Content<V> read(FriendlyByteBuf buf) {
+        @Environment(EnvType.CLIENT)
+        public static <V> void setup(){
+            ClientPlayNetworking.registerGlobalReceiver(ID, ((client, handler, buf, responseSender) -> {
                 String path = buf.readUtf(50);
                 ResourceLocation key = buf.readResourceLocation();
-                return new Content<>(path, key, new FriendlyByteBuf(buf.copy()));
-            }
+                var content = new Content<>(path, key, new FriendlyByteBuf(buf.copy()));
+                SyncManagement.acceptItem(path, key, content.readItem());
+            }));
+        }
 
-            public void handle(Content<V> msg) {
-                SyncManagement.acceptItem(msg.path, msg.key, msg.readItem());
-
-            }
-
-            @Environment(EnvType.CLIENT)
-            public static <V> void setup(){
-                ClientPlayNetworking.registerGlobalReceiver(ID, ((client, handler, buf, responseSender) -> {
-                    String path = buf.readUtf(50);
-                    ResourceLocation key = buf.readResourceLocation();
-                    V item = SyncManagement.readItem(path, buf);
-                    SyncManagement.acceptItem(path, key, item);
-                }));
-            }
+        public static class Provider<V extends CodecProvider<? super V>> {
 
             public static <R extends CodecProvider<? super R>> void sendTo(ServerPlayer player, String path, ResourceLocation k, R v) {
                 FriendlyByteBuf buf = PacketByteBufs.create();
@@ -127,6 +109,7 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
                 buf.writeResourceLocation(k);
                 SyncManagement.writeItem(path, v, buf);
                 ServerPlayNetworking.send(player, ID, buf);
+                Placebo.LOGGER.info("Sending packet to player {} with id {}, resource location {}", player, ID, k);
             }
 
             public static <R extends CodecProvider<? super R>> void sendToAll(String path, ResourceLocation k, R v) {
@@ -157,6 +140,14 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
 
         public void handle(End msg) {
             SyncManagement.endSync(msg.path);
+        }
+
+        @Environment(EnvType.CLIENT)
+        public static <V> void setup(){
+            ClientPlayNetworking.registerGlobalReceiver(ID, ((client, handler, buf, responseSender) -> {
+                String path = buf.readUtf(50);
+                SyncManagement.endSync(path);
+            }));
         }
 
         public static void sendToAll(String path) {

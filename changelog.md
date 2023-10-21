@@ -1,4 +1,7 @@
 
+## 0.0.7
+* Fix inability to connect to dedicated servers when using the dynamic registry (ie Zenith's adventure module)
+
 ## 0.0.6
 * Add an event to change item enchantment levels, does not apply to all contexts (intentionally, for example anvils do not call this event)
 * Readded porting lib loot, hopefully this version will not cause issues

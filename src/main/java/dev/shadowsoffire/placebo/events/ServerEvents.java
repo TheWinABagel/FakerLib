@@ -7,12 +7,11 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class ServerEvents {
-    private static MinecraftServer current;
+    private static MinecraftServer current = null;
 
     public static void init() {
         ServerLifecycleEvents.SERVER_STARTED.register(listener -> {
             current = listener;
-
         });
 
         ServerLifecycleEvents.SERVER_STOPPED.register(listener -> {

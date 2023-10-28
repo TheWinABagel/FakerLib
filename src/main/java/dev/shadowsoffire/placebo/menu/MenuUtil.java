@@ -1,11 +1,11 @@
 package dev.shadowsoffire.placebo.menu;
 
-import io.github.fabricators_of_create.porting_lib.util.NetworkHooks;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlags;
@@ -43,12 +43,13 @@ public class MenuUtil {
     }
 
     /**
-     * Helper method wrapping {@link NetworkHooks#openScreen} that returns {@link InteractionResult}.
+     * Helper method wrapping {@link Player#openMenu(MenuProvider)} that returns {@link InteractionResult}.
      * Designed for use with {@link BlockEntityMenu}.
      */
     public static <M extends AbstractContainerMenu> InteractionResult openGui(Player player, BlockPos pos, PosFactory<M> factory) {
         if (player.level().isClientSide) return InteractionResult.SUCCESS;
-        NetworkHooks.openScreen((ServerPlayer) player, new SimplerMenuProvider<>(player.level(), pos, factory), pos);
+        player.openMenu(new SimplerMenuProvider<>(player.level(), pos, factory));
+    //    NetworkHooks.openScreen((ServerPlayer) player, new SimplerMenuProvider<>(player.level(), pos, factory), pos);
         return InteractionResult.CONSUME;
     }
 

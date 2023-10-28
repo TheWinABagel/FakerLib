@@ -8,13 +8,14 @@
     "EnchantmentHelperMixin",
     "ItemStackMixin",
     "LootTablesMixin",
-    "ReloadableServerResourcesMixin",
-    "ServerResourcesMixin"
+    "PlayerMixin",
+    "ReloadableServerResourcesMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "ChatComponentMixin"
+    "ChatComponentMixin",
+    "EntityRenderDispatcherMixin"
   ]
 }

@@ -12,7 +12,7 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 
 import dev.shadowsoffire.placebo.json.ItemAdapter;
-import io.github.fabricators_of_create.porting_lib.util.CraftingHelper;
+import dev.shadowsoffire.placebo.recipe.RecipeHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
@@ -35,7 +35,7 @@ public class IngredientCodec implements Codec<Ingredient> {
     public <T> DataResult<Pair<Ingredient, T>> decode(DynamicOps<T> ops, T input) {
         JsonElement json = input instanceof JsonElement j ? j : ops.convertTo(JsonOps.INSTANCE, input);
         try {
-            return DataResult.success(Pair.of(CraftingHelper.getIngredient(json), input));
+            return DataResult.success(Pair.of(RecipeHelper.getIngredient(json), input));
         }
         catch (JsonSyntaxException ex) {
             return DataResult.error(ex::getMessage);

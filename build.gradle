@@ -56,22 +56,22 @@ dependencies {
 
 	//Porting lib, idk how to opt out :(
 	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:accessors:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:attributes:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:base:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:client_events:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:common:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:core:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:entity:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:extensions:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:lazy_registration:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:loot:2.1.1102+1.20-entity-refactor")) //Using a more recent version... hopefully fine?
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:mixin_extensions:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:models:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:registries:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:tags:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:tool_actions:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:attributes:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:base:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:client_events:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:common:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:core:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:entity:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:extensions:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:lazy_registration:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:loot:2.1.1102+1.20-entity-refactor")) //Using a more recent version... hopefully fine?
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:mixin_extensions:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:models:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:registries:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:tags:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:tool_actions:${project.port_lib_version}"))
 	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:transfer:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:utility:${project.port_lib_version}"))
+//	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:utility:${project.port_lib_version}"))
 
 
 	// Mixin Extras + Mixin^2 for mod compat
@@ -150,4 +150,5 @@ task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge)
 	mainFile.addGameVersion("1.20.1")
 	mainFile.addModLoader("fabric")
 	mainFile.displayName = project.archives_base_name + "-" + project.version
+	mainFile.addRequirement("306612") //FAPI
 }

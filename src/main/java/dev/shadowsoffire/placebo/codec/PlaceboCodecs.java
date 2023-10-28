@@ -12,7 +12,6 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.shadowsoffire.placebo.Placebo;
 import dev.shadowsoffire.placebo.json.ItemAdapter;
-import io.github.fabricators_of_create.porting_lib.util.CraftingHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.StringRepresentable;

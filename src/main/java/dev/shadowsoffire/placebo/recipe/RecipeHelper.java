@@ -1,10 +1,13 @@
 package dev.shadowsoffire.placebo.recipe;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonSyntaxException;
 import dev.shadowsoffire.placebo.Placebo;
 import dev.shadowsoffire.placebo.util.RunnableReloader;
-import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -17,38 +20,11 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Deprecated // Go use a json
 public final class RecipeHelper {
-/*
-    private static final Multimap<String, Consumer<RecipeFactory>> PROVIDERS = HashMultimap.create();
-
-    protected String modid;
-
-    public RecipeHelper(String modid) {
-        this.modid = modid;
-    }
-
-    /**
-     * Add a recipe provider, which will be invoked during registration time to instantiate recipe objects.
-     *
-     * @param provider The recipe provider you are adding.
-     * @see {@link RecipeFactory}
-     */
-    /*public void registerProvider(Consumer<RecipeFactory> provider) {
-        synchronized (PROVIDERS) {
-            if (provider == null) {
-                Placebo.LOGGER.error("Mod {} has attempted to add a null recipe provider.", this.modid);
-                Thread.dumpStack();
-            }
-            PROVIDERS.put(this.modid, provider);
-        }
-    }
 
     /**
      * Creates an ItemStack out of an appropriate stack-like object.<br>
@@ -62,7 +38,6 @@ public final class RecipeHelper {
     public static ItemStack makeStack(Object thing) {
         if (thing instanceof ItemStack stack) return stack;
         if (thing instanceof ItemLike il) return new ItemStack(il);
-        if (thing instanceof RegistryObject<?> ro) return new ItemStack((ItemLike) ro.get());
         throw new IllegalArgumentException("Attempted to create an ItemStack from something that cannot be converted: " + thing);
     }
 
@@ -87,7 +62,6 @@ public final class RecipeHelper {
             if (input instanceof TagKey tag) inputL.add(i, Ingredient.of(tag));
             else if (input instanceof String str) inputL.add(i, Ingredient.of(TagKey.create(Registries.ITEM, new ResourceLocation(str))));
             else if (input instanceof ItemStack stack && !stack.isEmpty()) inputL.add(i, Ingredient.of(stack));
-            else if (input instanceof ItemLike || input instanceof RegistryObject) inputL.add(i, Ingredient.of(makeStack(input)));
             else if (input instanceof Ingredient ing) inputL.add(i, ing);
             else if (allowEmpty) inputL.add(i, Ingredient.EMPTY);
             else throw new UnsupportedOperationException("Attempted to add invalid recipe.  Complain to the author of " + modid + ". (Input " + input + " not allowed.)");
@@ -95,117 +69,38 @@ public final class RecipeHelper {
         return inputL;
     }
 
-    /**
-     * Generates the reload listener which handles adding all RecipeHelper-based recipes.
-     */
-   /* @ApiStatus.Internal
-    public static PreparableReloadListener getReloader(RecipeManager mgr) {
-        return RunnableReloader.of(() -> {
-            mutableManager(mgr);
-            addRecipes(mgr);
-        });
-    }
+    public static Ingredient getIngredient(JsonElement json) {
+        if (json == null || json.isJsonNull())
+            throw new JsonSyntaxException("Json cannot be null");
 
-    private static void addRecipes(RecipeManager mgr) {
-        PROVIDERS.forEach((modid, provider) -> {
-            RecipeFactory factory = new RecipeFactory(modid);
-            provider.accept(factory);
-            factory.registerAll(mgr);
-        });
-        Placebo.LOGGER.info("Registered {} additional recipes.", RecipeFactory.totalRecipes);
-        RecipeFactory.resetCaches();
-    }
+        if (json.isJsonArray()) {
+            List<Ingredient> ingredients = Lists.newArrayList();
+            List<Ingredient> vanilla = Lists.newArrayList();
+            json.getAsJsonArray().forEach((ele) -> {
+                Ingredient ing = getIngredient(ele);
 
-    private static void mutableManager(RecipeManager mgr) {
-        mgr.byName = new HashMap<>(mgr.byName);
-        mgr.recipes = new HashMap<>(mgr.recipes);
-        for (RecipeType<?> type : mgr.recipes.keySet()) {
-            mgr.recipes.put(type, new HashMap<>(mgr.recipes.get(type)));
-        }
-    }
-
-    public static final class RecipeFactory {
-
-        private final String modid;
-        private final List<Recipe<?>> recipes = new ArrayList<>();
-        private static final Multimap<String, String> MODID_TO_NAMES = HashMultimap.create();
-        private static int totalRecipes = 0;
-
-        private RecipeFactory(String modid) {
-            this.modid = modid;
-        }
-
-        /**
-         * Directly add a recipe for registration.
-         *
-         * @param rec The recipe to add.
-         */
-      /*  public void addRecipe(Recipe<?> rec) {
-            if (rec == null || rec.getId() == null || rec.getSerializer() == null || BuiltInRegistries.RECIPE_SERIALIZER.getKey(rec.getSerializer()) == null) {
-                Placebo.LOGGER.error("Attempted to add an invalid recipe {}.", rec);
-                Thread.dumpStack();
-            }
-            this.recipes.add(rec);
-        }
-
-        /**
-         * Add a shapeless recipe with the provided input and output.
-         *
-         * @param output A stack-like output object.
-         * @param inputs An array of ingredient-like input objects.
-         * @see RecipeHelper#makeStack(Object) for the definition of stack-like.
-         * @see RecipeHelper#createInput(String, boolean, Object...) for the definition of ingredient-like.
-         */
-    /*    public void addShapeless(Object output, Object... inputs) {
-            ItemStack out = makeStack(output);
-            this.addRecipe(new ShapelessRecipe(this.name(out), this.modid, CraftingBookCategory.MISC, out, createInput(this.modid, false, inputs)));
-        }
-
-        /**
-         * Add a shaped recipe with the provided input, output, and size.
-         *
-         * @param output A stack-like output object.
-         * @param width  The grid width.
-         * @param height The grid height.
-         * @see RecipeHelper#makeStack(Object) for the definition of stack-like.
-         * @see RecipeHelper#createInput(String, boolean, Object...) for the definition of ingredient-like.
-         * @throws UnsupportedOperationException if <code>width * height != input.length</code> (meaning not enough inputs).
-         */
-   /*     public void addShaped(Object output, int width, int height, Object... input) {
-            this.addRecipe(this.genShaped(makeStack(output), width, height, input));
-        }
-
-        private ShapedRecipe genShaped(ItemStack output, int width, int height, Object... input) {
-            if (width * height != input.length) throw new UnsupportedOperationException("Attempted to add invalid shaped recipe.  Complain to the author of " + this.modid);
-            return new ShapedRecipe(this.name(output), this.modid, CraftingBookCategory.MISC, width, height, createInput(this.modid, true, input), output);
-        }
-
-        private ResourceLocation name(ItemStack out) {
-            String name = BuiltInRegistries.ITEM.getKey(out.getItem()).getPath();
-            while (MODID_TO_NAMES.get(this.modid).contains(name)) {
-                name += "_";
-            }
-            MODID_TO_NAMES.put(this.modid, name);
-            return new ResourceLocation(this.modid, name);
-        }
-
-        private void registerAll(RecipeManager mgr) {
-            this.recipes.forEach(r -> {
-                Map<ResourceLocation, Recipe<?>> map = mgr.recipes.computeIfAbsent(r.getType(), t -> new HashMap<>());
-                Recipe<?> old = map.get(r.getId());
-                if (old == null) {
-                    map.put(r.getId(), r);
-                    mgr.byName.put(r.getId(), r);
-                    totalRecipes++;
-                }
-                else Placebo.LOGGER.debug("Skipping registration for code recipe {} as a json recipe already exists with that ID.", r.getId());
+                if (ing.getClass() == Ingredient.class) //Vanilla, Due to how we read it splits each itemstack, so we pull out to re-merge later
+                    vanilla.add(ing);
+                else
+                    ingredients.add(ing);
             });
+
+            if (!vanilla.isEmpty())
+                ingredients.add(Ingredient.fromValues(vanilla.stream().flatMap((i) -> Arrays.stream(i.values))));
+
+            if (ingredients.size() == 0)
+                throw new JsonSyntaxException("Item array cannot be empty, at least one item must be defined");
+
+            if (ingredients.size() == 1)
+                return ingredients.get(0);
+
+            return DefaultCustomIngredients.any(ingredients.toArray(Ingredient[]::new));
         }
 
-        private static void resetCaches() {
-            MODID_TO_NAMES.clear();
-            totalRecipes = 0;
-        }
+        if (!json.isJsonObject())
+            throw new JsonSyntaxException("Expected ingredient to be a object or array of objects");
+
+        return Ingredient.fromJson(json);
     }
-*/
+
 }

@@ -1,7 +1,6 @@
 package dev.shadowsoffire.placebo.events;
 
 import com.google.common.base.Preconditions;
-import io.github.fabricators_of_create.porting_lib.event.BaseEvent;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.core.BlockPos;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 /**
  * This event is fired when an item would be used via {@link Item#useOn}<br>
  * It allows for the usage to be changed or cancelled.<br>
- * This event allows finer-tuned control over the actual item usage that cannot be achieved by using {@link RightClickBlock}
  */
 public class ItemUseEvent {
 

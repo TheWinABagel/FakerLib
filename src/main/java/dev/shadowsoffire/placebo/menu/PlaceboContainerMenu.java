@@ -1,7 +1,7 @@
 package dev.shadowsoffire.placebo.menu;
 
-import dev.shadowsoffire.placebo.cap.InternalItemHandler;
 import dev.shadowsoffire.placebo.menu.QuickMoveHandler.IExposedContainer;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -104,7 +104,7 @@ public abstract class PlaceboContainerMenu extends AbstractContainerMenu impleme
 
     protected class UpdatingSlot extends FilteredSlot {
 
-        public UpdatingSlot(InternalItemHandler handler, int index, int x, int y, Predicate<ItemStack> filter) {
+        public UpdatingSlot(ItemStackHandler handler, int index, int x, int y, Predicate<ItemStack> filter) {
             super(handler, index, x, y, filter);
         }
 

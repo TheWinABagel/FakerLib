@@ -1,7 +1,7 @@
 package dev.shadowsoffire.placebo.json;
 
 import com.google.gson.*;
-import io.github.fabricators_of_create.porting_lib.util.CraftingHelper;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -9,6 +9,7 @@ import net.minecraft.util.GsonHelper;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Type;
+import java.util.function.Predicate;
 
 public class JsonUtil {
 
@@ -26,21 +27,39 @@ public class JsonUtil {
 
     /**
      * Checks the conditions on a Json, and returns true if they are met.
-     * Checks both 'conditions' and 'forge:conditions'
      *
      * @param e       The Json being checked.
      * @param id      The ID of that json.
      * @param type    The type of the json, for logging.
      * @param logger  The logger to log to.
-     * @param context The context object used for resolving conditions.
      * @return True if the item's conditions are met, false otherwise.
      */
     public static boolean checkConditions(JsonElement e, ResourceLocation id, String type, Logger logger) {
-        if (!e.isJsonObject() || CraftingHelper.processConditions(e.getAsJsonObject(), "conditions") && CraftingHelper.processConditions(e.getAsJsonObject(), "forge:conditions")) {
+        if (!e.isJsonObject() || processConditions(e.getAsJsonObject(), "conditions")) {
             return true;
         }
         logger.trace("Skipping loading {} item with id {} as it's conditions were not met", type, id);
         return false;
+    }
+
+    public static boolean processConditions(JsonArray conditions) {
+        for (int x = 0; x < conditions.size(); x++) {
+            if (!conditions.get(x).isJsonObject())
+                throw new JsonSyntaxException("Conditions must be an array of JsonObjects");
+
+            JsonObject json = conditions.get(x).getAsJsonObject();
+            if (!getConditionPredicate(json).test(json))
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean processConditions(JsonObject json, String memberName) {
+        return !json.has(memberName) || processConditions(GsonHelper.getAsJsonArray(json, memberName));
+    }
+
+    public static Predicate<JsonObject> getConditionPredicate(JsonObject json) {
+        return ResourceConditions.get(new ResourceLocation(GsonHelper.getAsString(json, ResourceConditions.CONDITION_ID_KEY)));
     }
 
     public static <T> T getRegistryObject(JsonObject parent, String name, Registry<T> registry) {

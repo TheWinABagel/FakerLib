@@ -94,7 +94,6 @@ public class EnchantmentUtils {
 
     static float getEnchantPower(Level world, BlockPos pos) {
         return world.getBlockState(pos).getBlock() == Blocks.BOOKSHELF ? 1f : 0f;
-        //return world.getBlockState(pos).getEnchantPowerBonus(world, pos);
     }
 
     public static void addAllBooks(Enchantment enchantment, List<ItemStack> items) {

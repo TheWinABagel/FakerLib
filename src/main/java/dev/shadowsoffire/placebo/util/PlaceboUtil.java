@@ -58,23 +58,6 @@ public class PlaceboUtil {
     }
 
     /**
-     * Replaces a block and item and provides the original states to the new block.
-     * States are updated such that the old state references are still valid.
-     */
-    @Deprecated
-    public static <B extends Block & IReplacementBlock> void registerOverride(Block old, B block, String modid) {
-        ResourceLocation key = BuiltInRegistries.BLOCK.getKey(old);
-        Registry.register(BuiltInRegistries.BLOCK, key, block);
-        Registry.register(BuiltInRegistries.ITEM, key, new BlockItem(block, new Item.Properties()){
-            @Override
-            public String getCreatorModId(ItemStack itemStack) {
-                return modid;
-            }
-        });
-        overrideStates(old, block);
-    }
-
-    /**
      * Updates the references for a replaced block such that original BlockState objects are still valid.
      */
     @Deprecated

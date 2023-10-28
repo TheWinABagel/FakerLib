@@ -1,5 +1,7 @@
 package dev.shadowsoffire.placebo;
 
+import dev.shadowsoffire.placebo.patreon.TrailsManager;
+import dev.shadowsoffire.placebo.patreon.WingsManager;
 import dev.shadowsoffire.placebo.reload.ReloadListenerPacket;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -18,6 +20,8 @@ public class PlaceboClient implements ClientModInitializer {
         ReloadListenerPacket.Start.setup();
         ReloadListenerPacket.Content.setup();
         ReloadListenerPacket.End.setup();
+        WingsManager.init();
+        TrailsManager.init();
     }
 
 

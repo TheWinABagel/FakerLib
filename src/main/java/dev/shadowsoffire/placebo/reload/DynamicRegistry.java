@@ -13,8 +13,8 @@ import dev.shadowsoffire.placebo.Placebo;
 import dev.shadowsoffire.placebo.codec.CodecMap;
 import dev.shadowsoffire.placebo.codec.CodecProvider;
 import dev.shadowsoffire.placebo.events.ReloadableServerEvent;
+import dev.shadowsoffire.placebo.events.ServerEvents;
 import dev.shadowsoffire.placebo.json.JsonUtil;
-import io.github.fabricators_of_create.porting_lib.util.ServerLifecycleHooks;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -37,7 +37,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static dev.shadowsoffire.placebo.reload.DynamicRegistry.SyncManagement.syncAll;
@@ -457,7 +456,7 @@ public abstract class DynamicRegistry<R extends CodecProvider<? super R>> extend
          * @implNote Only called on the logical client.
          */
         static void endSync(String path) {
-            if (ServerLifecycleHooks.getCurrentServer() != null) return; // Do not propgate received changed on the host of a singleplayer world, as they may not be the full data.
+            if (ServerEvents.getCurrentServer() != null) return; // Do not propagate received changed on the host of a singleplayer world, as they may not be the full data.
             ifPresent(path, DynamicRegistry::pushStagedToLive);
         }
 

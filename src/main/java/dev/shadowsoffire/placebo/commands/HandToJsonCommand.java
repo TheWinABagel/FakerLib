@@ -22,7 +22,7 @@ public class HandToJsonCommand {
 
     public static final Gson GSON = Deserializers.createLootTableSerializer().setPrettyPrinting().create();
 
-    public static final DynamicCommandExceptionType NOT_FOUND = new DynamicCommandExceptionType(arg -> Component.translatable("placebo.cmd.not_found", arg));
+    public static final DynamicCommandExceptionType NOT_FOUND = new DynamicCommandExceptionType(arg -> Component.translatable("fakerlib.cmd.not_found", arg));
 
     public static void register(LiteralArgumentBuilder<CommandSourceStack> builder) {
         builder.then(Commands.literal("hand").executes(ctx -> {

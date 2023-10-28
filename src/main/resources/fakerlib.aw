@@ -17,3 +17,8 @@ accessible field net/minecraft/world/level/storage/loot/LootPool$Builder functio
 accessible field net/minecraft/server/MinecraftServer resources Lnet/minecraft/server/MinecraftServer$ReloadableResources;
 accessible field net/minecraft/world/level/block/state/StateHolder owner Ljava/lang/Object;
 mutable field net/minecraft/world/level/block/state/StateHolder owner Ljava/lang/Object;
+accessible method net/minecraft/server/MinecraftServer$ReloadableResources managers ()Lnet/minecraft/server/ReloadableServerResources;
+accessible field net/minecraft/server/MinecraftServer resources Lnet/minecraft/server/MinecraftServer$ReloadableResources;
+accessible method net/minecraft/world/item/crafting/Ingredient fromValues (Ljava/util/stream/Stream;)Lnet/minecraft/world/item/crafting/Ingredient;
+accessible field net/minecraft/world/item/crafting/Ingredient values [Lnet/minecraft/world/item/crafting/Ingredient$Value;
+accessible method net/minecraft/client/renderer/entity/LivingEntityRenderer addLayer (Lnet/minecraft/client/renderer/entity/layers/RenderLayer;)Z

@@ -1,4 +1,7 @@
 
+## 0.0.8
+* Remove most dependencies on porting lib, remove some unneeded classes, breaking change
+
 ## 0.0.7
 * Fix inability to connect to dedicated servers when using the dynamic registry (ie Zenith's adventure module)
 

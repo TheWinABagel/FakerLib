@@ -5,6 +5,7 @@ import dev.shadowsoffire.placebo.Placebo;
 import dev.shadowsoffire.placebo.packets.PatreonDisableMessage;
 import dev.shadowsoffire.placebo.patreon.PatreonUtils.PatreonParticleType;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -22,7 +23,7 @@ import java.util.*;
 public class TrailsManager {
 
     public static Map<UUID, PatreonParticleType> TRAILS = new HashMap<>();
-    public static final KeyMapping TOGGLE = new KeyMapping("fakerlib.toggleTrails", GLFW.GLFW_KEY_KP_9, "key.categories.fakerlib");
+    public static final KeyMapping TOGGLE = KeyBindingHelper.registerKeyBinding(new KeyMapping("fakerlib.toggleTrails",GLFW.GLFW_KEY_KP_9, "key.categories.fakerlib"));
     public static final Set<UUID> DISABLED = new HashSet<>();
 
     public static void init() {
@@ -30,7 +31,7 @@ public class TrailsManager {
         new Thread(() -> {
             Placebo.LOGGER.info("Loading patreon trails data...");
             try {
-                URL url = new URL("https://raw.githubusercontent.com/Shadows-of-Fire/Placebo/1.16/PatreonTrails.txt");
+                URL url = new URL("https://raw.githubusercontent.com/TheWinABagel/FakerLib/master/TestTrails.txt");
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
                     String s;
                     while ((s = reader.readLine()) != null) {
@@ -52,8 +53,7 @@ public class TrailsManager {
                 // not possible
             }
             Placebo.LOGGER.info("Loaded {} patreon trails.", TRAILS.size());
-        //    if (TRAILS.size() > 0) MinecraftForge.EVENT_BUS.register(TrailsManager.class);
-        }, "Placebo Patreon Trail Loader").start();
+        }, "Placebo (FakerLib) Patreon Trail Loader").start();
         clientTick();
         keys();
     }
@@ -77,8 +77,9 @@ public class TrailsManager {
 
     public static void keys() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (TOGGLE.isDown()) {
-    //            Placebo.CHANNEL.sendToServer(new PatreonDisableMessage(0));
+            while (TOGGLE.consumeClick()) {
+                //to server
+                PatreonDisableMessage.sendToServer(new PatreonDisableMessage(0, client.player.getUUID()));
             }
         });
     }

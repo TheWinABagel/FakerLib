@@ -1,5 +1,6 @@
 package dev.shadowsoffire.placebo.mixin;
 
+import dev.shadowsoffire.placebo.Placebo;
 import dev.shadowsoffire.placebo.patreon.WingsManager;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -18,10 +19,9 @@ import java.util.Map;
 @Mixin(EntityRenderDispatcher.class)
 public class EntityRenderDispatcherMixin {
 
+    @Shadow private Map<String, EntityRenderer<? extends Player>> playerRenderers; //TODO swap to LivingEntityFeatureRendererRegistrationCallback
 
-    @Shadow private Map<String, EntityRenderer<? extends Player>> playerRenderers;
-
-    @Inject(method = "onResourceManagerReload", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "onResourceManagerReload", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILSOFT)
     private void addTrailsAndWings(ResourceManager resourceManager, CallbackInfo ci, EntityRendererProvider.Context context) {
         WingsManager.addLayers(context, this.playerRenderers);
     }

@@ -7,6 +7,7 @@ import dev.shadowsoffire.placebo.events.ServerEvents;
 import dev.shadowsoffire.placebo.json.GearSetRegistry;
 import dev.shadowsoffire.placebo.loot.StackLootEntry;
 import dev.shadowsoffire.placebo.packets.ButtonClickMessage;
+import dev.shadowsoffire.placebo.packets.PatreonDisableMessage;
 import dev.shadowsoffire.placebo.reload.DynamicRegistry;
 import dev.shadowsoffire.placebo.util.PlaceboTaskQueue;
 import dev.shadowsoffire.placebo.util.PlaceboUtil;
@@ -35,6 +36,7 @@ public class Placebo implements ModInitializer {
         PlaceboTaskQueue.init();
         ServerEvents.init();
         ButtonClickMessage.init();
+        PatreonDisableMessage.init();
         registerCommands();
         TextColor.NAMED_COLORS = new HashMap<>(TextColor.NAMED_COLORS);
         PlaceboUtil.registerCustomColor(GradientColor.RAINBOW);

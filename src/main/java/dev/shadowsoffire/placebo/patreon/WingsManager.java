@@ -7,6 +7,7 @@ import dev.shadowsoffire.placebo.patreon.PatreonUtils.WingType;
 import dev.shadowsoffire.placebo.patreon.wings.Wing;
 import dev.shadowsoffire.placebo.patreon.wings.WingLayer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -27,7 +28,7 @@ import java.util.*;
 public class WingsManager {
 
     public static Map<UUID, WingType> WINGS = new HashMap<>();
-    public static final KeyMapping TOGGLE = new KeyMapping("fakerlib.toggleWings", GLFW.GLFW_KEY_KP_8, "key.categories.fakerlib");
+    public static final KeyMapping TOGGLE = KeyBindingHelper.registerKeyBinding(new KeyMapping("fakerlib.toggleWings", GLFW.GLFW_KEY_KP_8, "key.categories.fakerlib"));
     public static final Set<UUID> DISABLED = new HashSet<>();
     public static final ModelLayerLocation WING_LOC = new ModelLayerLocation(new ResourceLocation(Placebo.MODID, "wings"), "main");
 
@@ -36,7 +37,7 @@ public class WingsManager {
         new Thread(() -> {
             Placebo.LOGGER.info("Loading patreon wing data...");
             try {
-                URL url = new URL("https://raw.githubusercontent.com/Shadows-of-Fire/Placebo/1.16/PatreonWings.txt");
+                URL url = new URL("https://raw.githubusercontent.com/TheWinABagel/FakerLib/master/TestWings.txt");
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
                     String s;
                     while ((s = reader.readLine()) != null) {
@@ -59,14 +60,15 @@ public class WingsManager {
             }
             Placebo.LOGGER.info("Loaded {} patreon wings.", WINGS.size());
         //    if (WINGS.size() > 0) MinecraftForge.EVENT_BUS.register(WingsManager.class);
-        }, "Placebo Patreon Wing Loader").start();
+        }, "Placebo (FakerLib) Patreon Wing Loader").start();
         keys();
     }
 
     public static void keys() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (TOGGLE.isDown()) {
-        //        Placebo.CHANNEL.sendToServer(new PatreonDisableMessage(1));
+            while (TOGGLE.consumeClick()) {
+                //to server
+                PatreonDisableMessage.sendToServer(new PatreonDisableMessage(1, client.player.getUUID()));
             }
         });
     }

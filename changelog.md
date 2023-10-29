@@ -1,6 +1,7 @@
 
 ## 0.0.8
 * Remove most dependencies on porting lib, remove some unneeded classes, breaking change
+* Readd support for shadow's patreon wings and trails
 
 ## 0.0.7
 * Fix inability to connect to dedicated servers when using the dynamic registry (ie Zenith's adventure module)

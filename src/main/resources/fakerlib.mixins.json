@@ -8,7 +8,6 @@
     "EnchantmentHelperMixin",
     "ItemStackMixin",
     "LootTablesMixin",
-    "PlayerMixin",
     "ReloadableServerResourcesMixin"
   ],
   "injectors": {
@@ -16,6 +15,7 @@
   },
   "client": [
     "ChatComponentMixin",
+    "PlayerMixin",
     "EntityRenderDispatcherMixin"
   ]
 }

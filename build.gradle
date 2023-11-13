@@ -146,9 +146,9 @@ task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge)
 	def mainFile = upload(853197, remapJar)
 	mainFile.changelog = "https://github.com/TheWinABagel/FakerLib/blob/master/changelog.md"
 	mainFile.releaseType = "beta"
-	//mainFile.addJavaVersion("17")
+	//mainFile.addJavaVersion("17") //doesn't work for reasons unknown to me
 	mainFile.addGameVersion("1.20.1")
 	mainFile.addModLoader("fabric")
 	mainFile.displayName = project.archives_base_name + "-" + project.version
-	mainFile.addRequirement("306612") //FAPI
+	mainFile.addRequirement("fabric-api") //FAPI
 }

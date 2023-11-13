@@ -1,4 +1,8 @@
 
+
+## 0.0.9
+* Fix crashing on servers
+
 ## 0.0.8
 * Remove most dependencies on porting lib, remove some unneeded classes, breaking change
 * Readd support for shadow's patreon wings and trails

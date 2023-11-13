@@ -4,6 +4,8 @@ import dev.shadowsoffire.placebo.patreon.PatreonPreview;
 import dev.shadowsoffire.placebo.patreon.PatreonUtils;
 import dev.shadowsoffire.placebo.patreon.TrailsManager;
 import dev.shadowsoffire.placebo.patreon.WingsManager;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -22,8 +24,9 @@ public class PlayerMixin {
     @Unique
     private static int counter = 0;
 
+    @Environment(EnvType.CLIENT)
     @Inject(method = "tick", at = @At("TAIL"))
-    private void patreonWings(CallbackInfo ci){
+    private void patreonWings(CallbackInfo ci) {
         Player player = (Player) (Object) this;
         if (player.level().isClientSide) {
             if (player.tickCount >= 200) {
@@ -51,4 +54,5 @@ public class PlayerMixin {
             }
         }
     }
+
 }

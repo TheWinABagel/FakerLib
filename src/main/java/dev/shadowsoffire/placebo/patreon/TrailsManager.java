@@ -1,18 +1,15 @@
 package dev.shadowsoffire.placebo.patreon;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import dev.shadowsoffire.placebo.Placebo;
+import dev.shadowsoffire.placebo.PlaceboClient;
 import dev.shadowsoffire.placebo.packets.PatreonDisableMessage;
 import dev.shadowsoffire.placebo.patreon.PatreonUtils.PatreonParticleType;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,11 +20,9 @@ import java.util.*;
 public class TrailsManager {
 
     public static Map<UUID, PatreonParticleType> TRAILS = new HashMap<>();
-    public static final KeyMapping TOGGLE = KeyBindingHelper.registerKeyBinding(new KeyMapping("fakerlib.toggleTrails",GLFW.GLFW_KEY_KP_9, "key.categories.fakerlib"));
     public static final Set<UUID> DISABLED = new HashSet<>();
 
     public static void init() {
-
         new Thread(() -> {
             Placebo.LOGGER.info("Loading patreon trails data...");
             try {
@@ -54,8 +49,6 @@ public class TrailsManager {
             }
             Placebo.LOGGER.info("Loaded {} patreon trails.", TRAILS.size());
         }, "Placebo (FakerLib) Patreon Trail Loader").start();
-        clientTick();
-        keys();
     }
 
     public static void clientTick() {
@@ -63,6 +56,7 @@ public class TrailsManager {
             PatreonParticleType t = null;
             if (Minecraft.getInstance().level != null) {
                 for (Player player : Minecraft.getInstance().level.players()) {
+                    Placebo.LOGGER.info("Tick count: {}, disabled contains: {}, trails contains: {}", (player.tickCount * 3 % 2 == 0), !DISABLED.contains(player.getUUID()), (t = TRAILS.get(player.getUUID())) != null);
                     if (!player.isInvisible() && player.tickCount * 3 % 2 == 0 && !DISABLED.contains(player.getUUID()) && (t = TRAILS.get(player.getUUID())) != null) {
                         ClientLevel world = (ClientLevel) player.level();
                         RandomSource rand = world.random;
@@ -77,7 +71,7 @@ public class TrailsManager {
 
     public static void keys() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (TOGGLE.consumeClick()) {
+            while (PlaceboClient.TOGGLE_TRAILS.consumeClick()) {
                 //to server
                 PatreonDisableMessage.sendToServer(new PatreonDisableMessage(0, client.player.getUUID()));
             }

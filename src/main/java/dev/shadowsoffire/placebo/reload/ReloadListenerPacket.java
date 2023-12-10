@@ -109,7 +109,6 @@ public abstract class ReloadListenerPacket<T extends ReloadListenerPacket<T>> {
                 buf.writeResourceLocation(k);
                 SyncManagement.writeItem(path, v, buf);
                 ServerPlayNetworking.send(player, ID, buf);
-                Placebo.LOGGER.info("Sending packet to player {} with id {}, resource location {}", player, ID, k);
             }
 
             public static <R extends CodecProvider<? super R>> void sendToAll(String path, ResourceLocation k, R v) {

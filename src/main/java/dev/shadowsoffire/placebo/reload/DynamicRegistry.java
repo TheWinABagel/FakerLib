@@ -470,7 +470,9 @@ public abstract class DynamicRegistry<R extends CodecProvider<? super R>> extend
 
         public static void syncAll() {
             ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
-                SYNC_REGISTRY.values().forEach(r -> r.sync(player));
+                SYNC_REGISTRY.values().forEach(r -> {
+                    r.sync(player);
+                });
             });
         }
     }

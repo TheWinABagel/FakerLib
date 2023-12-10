@@ -9,11 +9,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public class PatreonDisableMessage {
 
@@ -30,7 +29,7 @@ public class PatreonDisableMessage {
         this.id = id;
     }
 
-    public static void init() {
+    public static void initServer() {
         ServerPlayNetworking.registerGlobalReceiver(ID, (server, player, handler, buf, responseSender) -> {
             int type = buf.readByte();
             int id = buf.readByte();
@@ -46,6 +45,26 @@ public class PatreonDisableMessage {
                 set.add(uuid);
                 player.displayClientMessage(nameOff, false);
             }
+            if (server.isDedicatedServer()) {
+                server.getPlayerList().getPlayers().forEach(serverPlayer -> {
+                    sendToPlayer(new PatreonDisableMessage(type, uuid), serverPlayer);
+                });
+            }
+        });
+    }
+
+    public static void initClient() {
+        ClientPlayNetworking.registerGlobalReceiver(ID, (client, handler, buf, responseSender) -> {
+            int type = buf.readByte();
+            int id = buf.readByte();
+            UUID uuid = buf.readUUID();
+            Set<UUID> set = type == 0 ? TrailsManager.DISABLED : WingsManager.DISABLED;
+            if (set.contains(uuid)) {
+                set.remove(uuid);
+            }
+            else {
+                set.add(uuid);
+            }
         });
     }
 
@@ -57,46 +76,11 @@ public class PatreonDisableMessage {
         ClientPlayNetworking.send(ID, buf);
     }
 
-/*
-    public static class Provider implements MessageProvider<PatreonDisableMessage> {
-
-        @Override
-        public Class<PatreonDisableMessage> getMsgClass() {
-            return PatreonDisableMessage.class;
-        }
-
-        @Override
-        public void write(PatreonDisableMessage msg, FriendlyByteBuf buf) {
-            buf.writeByte(msg.type);
-            buf.writeByte(msg.id == null ? 0 : 1);
-            if (msg.id != null) buf.writeUUID(msg.id);
-        }
-
-        @Override
-        public PatreonDisableMessage read(FriendlyByteBuf buf) {
-            int type = buf.readByte();
-            if (buf.readByte() == 1) {
-                return new PatreonDisableMessage(type, buf.readUUID());
-            }
-            else return new PatreonDisableMessage(type);
-        }
-
-        @Override
-        public void handle(PatreonDisableMessage msg, Supplier<Context> ctx) {
-            if (ctx.get().getDirection() == NetworkDirection.PLAY_TO_SERVER) {
-                MessageHelper.handlePacket(() -> {
-                    PacketDistro.sendToAll(Placebo.CHANNEL, new PatreonDisableMessage(msg.type, ctx.get().getSender().getUUID()));
-                }, ctx);
-            }
-            else MessageHelper.handlePacket(() -> {
-                Set<UUID> set = msg.type == 0 ? TrailsManager.DISABLED : WingsManager.DISABLED;
-                if (set.contains(msg.id)) {
-                    set.remove(msg.id);
-                }
-                else set.add(msg.id);
-            }, ctx);
-        }
-
+    public static void sendToPlayer(PatreonDisableMessage msg, ServerPlayer player) {
+        FriendlyByteBuf buf = PacketByteBufs.create();
+        buf.writeByte(msg.type);
+        buf.writeByte(msg.id == null ? 0 : 1);
+        if (msg.id != null) buf.writeUUID(msg.id);
+        ServerPlayNetworking.send(player, ID, buf);
     }
-*/
 }

@@ -12,24 +12,30 @@ import java.util.function.Function;
 /**
  * Level Function that allows for only returning "nice" stepped numbers.
  */
-public final class StepFunction implements Float2FloatFunction {
-
-    // Formatter::off
-    public static final Codec<StepFunction> STRICT_CODEC = RecordCodecBuilder.create(inst -> inst.group(
-        Codec.FLOAT.fieldOf("min").forGetter(StepFunction::min),
-        Codec.INT.fieldOf("steps").forGetter(StepFunction::steps),
-        Codec.FLOAT.fieldOf("step").forGetter(StepFunction::step))
-        .apply(inst, StepFunction::new));
-    // Formatter::on
+/**
+ * Level Function that allows for only returning "nice" stepped numbers.
+ */
+public record StepFunction(float min, int steps, float step) implements Float2FloatFunction {
 
     /**
-     * Accepts a float value, creating a constant step function, or a proper step function.
+     * Accepts a fully defined step function with min, steps, and step values.
      */
-    public static final Codec<StepFunction> CODEC = Codec.either(Codec.FLOAT, STRICT_CODEC).xmap(e -> e.map(StepFunction::constant, Function.identity()), Either::right);
+    public static final Codec<StepFunction> STRICT_CODEC = RecordCodecBuilder.create(inst -> inst
+            .group(
+                    Codec.FLOAT.fieldOf("min").forGetter(StepFunction::min),
+                    Codec.intRange(1, Integer.MAX_VALUE).fieldOf("steps").forGetter(StepFunction::steps),
+                    Codec.FLOAT.fieldOf("step").forGetter(StepFunction::step))
+            .apply(inst, StepFunction::new));
 
-    protected final float min;
-    protected final int steps;
-    protected final float step;
+    /**
+     * Accepts a single float value that will produce a {@linkplain StepFunction#constant constant step function}.
+     */
+    public static final Codec<StepFunction> CONSTANT_CODEC = Codec.FLOAT.xmap(StepFunction::constant, StepFunction::min);
+
+    /**
+     * Either codec between {@link #CONSTANT_CODEC} and {@link #CONSTANT_CODEC}, producing a step function from either a single float or the full definition.
+     */
+    public static final Codec<StepFunction> CODEC = Codec.either(CONSTANT_CODEC, STRICT_CODEC).xmap(e -> e.map(Function.identity(), Function.identity()), Either::right);
 
     /**
      * Create a new StepFunction
@@ -54,25 +60,13 @@ public final class StepFunction implements Float2FloatFunction {
         return (int) this.get(level);
     }
 
-    public float min() {
-        return this.min;
-    }
-
-    public int steps() {
-        return this.steps;
-    }
-
-    public float step() {
-        return this.step;
-    }
-
     public float max() {
         return this.min + this.steps * this.step;
     }
 
     /**
      * Returns the step number that the current level value corresponds to.<br>
-     * Does not return a value higher than {link steps()}, which is the max number of steps.
+     * Does not return a value higher than {@link #step()}, which is the max number of steps.
      */
     public int getStep(float level) {
         return (int) (this.steps * (level + 0.5F / this.steps));

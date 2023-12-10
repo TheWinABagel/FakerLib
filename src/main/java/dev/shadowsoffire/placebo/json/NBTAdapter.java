@@ -14,9 +14,9 @@ import java.util.function.Function;
 
 public class NBTAdapter implements JsonDeserializer<CompoundTag>, JsonSerializer<CompoundTag> {
 
+    @Deprecated
     public static final NBTAdapter INSTANCE = new NBTAdapter();
 
-    // Formatter::off
     public static final Codec<CompoundTag> EITHER_CODEC = Codec.either(Codec.STRING, CompoundTag.CODEC).xmap(either -> either.map(t -> {
         try {
             return TagParser.parseTag(t);
@@ -25,7 +25,6 @@ public class NBTAdapter implements JsonDeserializer<CompoundTag>, JsonSerializer
             throw new RuntimeException(e);
         }
     }, Function.identity()), Either::right);
-    // Formatter::on
 
     @Override
     public JsonElement serialize(CompoundTag src, Type typeOfSrc, JsonSerializationContext context) {

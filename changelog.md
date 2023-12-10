@@ -1,5 +1,10 @@
 
 
+
+## 0.1.0
+* Update to be in line with latest Placebo (8.6.0)
+* Fix trails + wings disabling disconnecting client on dedicated servers
+
 ## 0.0.9
 * Fix crashing on servers
 

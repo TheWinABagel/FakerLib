@@ -2,23 +2,19 @@ package dev.shadowsoffire.placebo;
 
 import dev.shadowsoffire.placebo.color.GradientColor;
 import dev.shadowsoffire.placebo.commands.PlaceboCommand;
-import dev.shadowsoffire.placebo.events.ItemUseEvent;
 import dev.shadowsoffire.placebo.events.ServerEvents;
 import dev.shadowsoffire.placebo.json.GearSetRegistry;
 import dev.shadowsoffire.placebo.loot.StackLootEntry;
 import dev.shadowsoffire.placebo.packets.ButtonClickMessage;
 import dev.shadowsoffire.placebo.packets.PatreonDisableMessage;
+import dev.shadowsoffire.placebo.patreon.TrailsManager;
+import dev.shadowsoffire.placebo.patreon.WingsManager;
 import dev.shadowsoffire.placebo.reload.DynamicRegistry;
 import dev.shadowsoffire.placebo.util.PlaceboTaskQueue;
 import dev.shadowsoffire.placebo.util.PlaceboUtil;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.core.Registry;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,7 +32,7 @@ public class Placebo implements ModInitializer {
         PlaceboTaskQueue.init();
         ServerEvents.init();
         ButtonClickMessage.init();
-        PatreonDisableMessage.init();
+        PatreonDisableMessage.initServer();
         registerCommands();
         TextColor.NAMED_COLORS = new HashMap<>(TextColor.NAMED_COLORS);
         PlaceboUtil.registerCustomColor(GradientColor.RAINBOW);
@@ -44,6 +40,8 @@ public class Placebo implements ModInitializer {
         GearSetRegistry.INSTANCE.register();
         LOGGER.info("Look at the cleanse, look at the moves!");
         StackLootEntry.poke();
+        WingsManager.init();
+        TrailsManager.init();
     }
 
 

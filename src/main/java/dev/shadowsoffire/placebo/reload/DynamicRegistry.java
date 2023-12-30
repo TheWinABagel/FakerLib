@@ -1,12 +1,12 @@
 package dev.shadowsoffire.placebo.reload;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import dev.shadowsoffire.placebo.Placebo;
@@ -31,7 +31,6 @@ import net.minecraft.world.entity.player.Player;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -218,9 +217,12 @@ public abstract class DynamicRegistry<R extends CodecProvider<? super R>> extend
         if (this.synced) SyncManagement.registerForSync(this);
         ReloadableServerEvent.addListeners(this);
     }
+
     public static void sync(){
         syncAll();
     }
+
+
 
     /**
      * Creates a {@link DynamicHolder} pointing to a value stored in this reload listener.
@@ -331,6 +333,7 @@ public abstract class DynamicRegistry<R extends CodecProvider<? super R>> extend
      * @param value The value being registered.
      */
     protected void validateItem(ResourceLocation key, R value) {}
+
 
     /**
      * Replaces the contents of the live registry with the staging registry.<br>

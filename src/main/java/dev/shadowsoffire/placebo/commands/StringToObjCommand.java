@@ -1,8 +1,5 @@
 package dev.shadowsoffire.placebo.commands;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,7 +7,6 @@ import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.serialization.JsonOps;
-
 import dev.shadowsoffire.placebo.Placebo;
 import dev.shadowsoffire.placebo.json.NBTAdapter;
 import net.minecraft.commands.CommandBuildContext;
@@ -21,11 +17,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.loot.Deserializers;
 
+import java.io.IOException;
+import java.io.StringWriter;
+
 public class StringToObjCommand {
 
     public static final Gson GSON = Deserializers.createLootTableSerializer().setPrettyPrinting().create();
 
-    public static final DynamicCommandExceptionType NOT_FOUND = new DynamicCommandExceptionType(arg -> Component.translatable("placebo.cmd.not_found", arg));
+    public static final DynamicCommandExceptionType NOT_FOUND = new DynamicCommandExceptionType(arg -> Component.translatable("fakerlib.cmd.not_found", arg));
 
     public static void register(LiteralArgumentBuilder<CommandSourceStack> builder, CommandBuildContext buildCtx) {
         builder.then(Commands.literal("string_to_obj").requires(src -> src.hasPermission(2)).then(Commands.argument("nbt_item", ItemArgument.item(buildCtx)).executes(ctx -> {

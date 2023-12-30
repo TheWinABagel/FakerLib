@@ -3,6 +3,7 @@ package dev.shadowsoffire.placebo.commands;
 import com.google.gson.Gson;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import dev.shadowsoffire.placebo.mixin.getters.MinecraftServerAccessor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -26,7 +27,7 @@ public class SerializeLootTableCommand {
     public static void register(LiteralArgumentBuilder<CommandSourceStack> builder) {
         builder.then(Commands.literal("serialize_loot_table").requires(s -> s.hasPermission(2)).then(Commands.argument("loot_table", ResourceLocationArgument.id()).suggests(LootCommand.SUGGEST_LOOT_TABLE).executes(ctx -> {
             ResourceLocation id = ResourceLocationArgument.getId(ctx, "loot_table");
-            LootTable table = ctx.getSource().getServer().resources.managers().getLootData().getLootTable(id);
+            LootTable table = ((MinecraftServerAccessor) ctx.getSource().getServer()).getResources().managers().getLootData().getLootTable(id);
             if (table == LootTable.EMPTY) throw NOT_FOUND.create(id);
             String path = "fakerlib_serialized/" + id.getNamespace() + "/loot_tables/" + id.getPath() + ".json";
             File file = new File(FabricLoader.getInstance().getGameDir().toFile(), path);

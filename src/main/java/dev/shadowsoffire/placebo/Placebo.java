@@ -5,6 +5,7 @@ import dev.shadowsoffire.placebo.commands.PlaceboCommand;
 import dev.shadowsoffire.placebo.events.ServerEvents;
 import dev.shadowsoffire.placebo.json.GearSetRegistry;
 import dev.shadowsoffire.placebo.loot.StackLootEntry;
+import dev.shadowsoffire.placebo.mixin.getters.TextColorGetter;
 import dev.shadowsoffire.placebo.packets.ButtonClickMessage;
 import dev.shadowsoffire.placebo.packets.PatreonDisableMessage;
 import dev.shadowsoffire.placebo.patreon.TrailsManager;
@@ -14,7 +15,6 @@ import dev.shadowsoffire.placebo.util.PlaceboTaskQueue;
 import dev.shadowsoffire.placebo.util.PlaceboUtil;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.network.chat.TextColor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +34,8 @@ public class Placebo implements ModInitializer {
         ButtonClickMessage.init();
         PatreonDisableMessage.initServer();
         registerCommands();
-        TextColor.NAMED_COLORS = new HashMap<>(TextColor.NAMED_COLORS);
+        TextColorGetter.setNAMED_COLORS(new HashMap<>(TextColorGetter.getNAMED_COLORS()));
+        //TextColor.NAMED_COLORS = new HashMap<>(TextColor.NAMED_COLORS);
         PlaceboUtil.registerCustomColor(GradientColor.RAINBOW);
         DynamicRegistry.sync();
         GearSetRegistry.INSTANCE.register();

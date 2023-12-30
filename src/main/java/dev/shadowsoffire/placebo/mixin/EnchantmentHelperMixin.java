@@ -1,8 +1,6 @@
 package dev.shadowsoffire.placebo.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.shadowsoffire.placebo.Placebo;
 import dev.shadowsoffire.placebo.events.PlaceboEventFactory;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -20,10 +18,7 @@ public class EnchantmentHelperMixin {
         private static void initializeEnchLevelEvent(Enchantment enchantment, ItemStack stack, CallbackInfoReturnable<Integer> cir, @Local CompoundTag compoundTag){
         if (stack.isEmpty()) return;
         int result = PlaceboEventFactory.getEnchantmentLevelSpecific(EnchantmentHelper.getEnchantmentLevel(compoundTag), stack, enchantment);
-        //Placebo.LOGGER.info("Enchantment level: {}, old: {}", result, EnchantmentHelper.getEnchantmentLevel(compoundTag));
         cir.setReturnValue(result);
     }
-
-
 
 }

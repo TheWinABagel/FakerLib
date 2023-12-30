@@ -2,11 +2,10 @@ package dev.shadowsoffire.placebo.util;
 
 import com.google.common.collect.ImmutableList;
 import dev.shadowsoffire.placebo.Placebo;
-import dev.shadowsoffire.placebo.recipe.RecipeHelper;
+import dev.shadowsoffire.placebo.mixin.getters.TextColorGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -14,12 +13,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,17 +51,6 @@ public class PlaceboUtil {
             //     out[i] = RecipeHelper.makeStack(args[i]);
         }
         return out;
-    }
-
-    /**
-     * Updates the references for a replaced block such that original BlockState objects are still valid.
-     */
-    @Deprecated
-    public static <B extends Block & IReplacementBlock> void overrideStates(Block old, B block) {
-        block.setStateContainer(old.getStateDefinition());
-        block._setDefaultState(old.defaultBlockState());
-        block.getStateDefinition().getPossibleStates().forEach(b -> b.owner = block);
-    //    block.getStateDefinition().owner = block;
     }
 
     /**
@@ -107,7 +92,6 @@ public class PlaceboUtil {
     static Map<ResourceLocation, RecipeType<?>> unregisteredTypes = new HashMap<>();
 
     @SuppressWarnings("unchecked")
-    @Deprecated // Use defreg
     public static <T extends Recipe<?>> RecipeType<T> makeRecipeType(final String pIdentifier) {
         if (late) throw new RuntimeException("Attempted to register a recipe type after the registration period closed.");
         RecipeType<T> type = new RecipeType<>(){
@@ -120,7 +104,6 @@ public class PlaceboUtil {
         return type;
     }
 
-    @Deprecated
     public static void registerTypes() {
         unregisteredTypes.forEach((key, type) -> Registry.register(BuiltInRegistries.RECIPE_TYPE, key, type));
         Placebo.LOGGER.debug("Registered {} recipe types.", unregisteredTypes.size());
@@ -134,7 +117,7 @@ public class PlaceboUtil {
      * This is not required for any static color values, because they can be represented as a hex int.
      */
     public static <T extends TextColor> void registerCustomColor(T color) {
-        TextColor.NAMED_COLORS.put(color.serialize(), color);
+        TextColorGetter.getNAMED_COLORS().put(color.serialize(), color);
     }
 
 }

@@ -17,10 +17,6 @@ public class PlaceboEventFactory {
         return null;
     }
 
-    /**
-     * Called from {link IForgeItemStack#getEnchantmentLevel(Enchantment)}
-     * Injected via coremods/get_ench_level_event_specific.js
-     */
     public static int getEnchantmentLevelSpecific(int level, ItemStack stack, Enchantment ench) {
         var enchMap = new HashMap<Enchantment, Integer>();
         enchMap.put(ench, level);
@@ -28,10 +24,6 @@ public class PlaceboEventFactory {
         return eventResult.get(ench);
     }
 
-    /**
-     * Called from {link IForgeItemStack#getAllEnchantments()}
-     * Injected via coremods/get_ench_level_event.js
-     */
     public static Map<Enchantment, Integer> getEnchantmentLevel(Map<Enchantment, Integer> enchantments, ItemStack stack) {
         enchantments = new HashMap<>(enchantments);
         GetEnchantmentLevelEvent.GET_ENCHANTMENT_LEVEL.invoker().onEnchantRequest(enchantments, stack);

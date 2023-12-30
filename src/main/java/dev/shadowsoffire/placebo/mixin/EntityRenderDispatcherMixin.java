@@ -1,6 +1,7 @@
 package dev.shadowsoffire.placebo.mixin;
 
 import dev.shadowsoffire.placebo.PlaceboClient;
+import dev.shadowsoffire.placebo.mixin.getters.LivingEntityRendererAccessor;
 import dev.shadowsoffire.placebo.patreon.wings.Wing;
 import dev.shadowsoffire.placebo.patreon.wings.WingLayer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -35,7 +36,7 @@ public class EntityRenderDispatcherMixin {
         Wing.INSTANCE = new Wing(context.getModelSet().bakeLayer(PlaceboClient.WING_LOC));
         for (String s : skins.keySet()) {
             LivingEntityRenderer skin = (LivingEntityRenderer) skins.get(s);
-            skin.addLayer(new WingLayer(skin));
+            ((LivingEntityRendererAccessor) skin).callAddLayer(new WingLayer(skin));
         }
     }
 }

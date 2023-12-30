@@ -56,7 +56,6 @@ public class TrailsManager {
             PatreonParticleType t = null;
             if (Minecraft.getInstance().level != null) {
                 for (Player player : Minecraft.getInstance().level.players()) {
-                    Placebo.LOGGER.info("Tick count: {}, disabled contains: {}, trails contains: {}", (player.tickCount * 3 % 2 == 0), !DISABLED.contains(player.getUUID()), (t = TRAILS.get(player.getUUID())) != null);
                     if (!player.isInvisible() && player.tickCount * 3 % 2 == 0 && !DISABLED.contains(player.getUUID()) && (t = TRAILS.get(player.getUUID())) != null) {
                         ClientLevel world = (ClientLevel) player.level();
                         RandomSource rand = world.random;

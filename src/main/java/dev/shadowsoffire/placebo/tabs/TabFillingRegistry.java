@@ -1,19 +1,20 @@
 package dev.shadowsoffire.placebo.tabs;
 
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.ItemLike;
-import org.jetbrains.annotations.ApiStatus;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
  * Class for managing the new method of filling creative tabs,
  * without having to bulk all the logic into one master method.
  */
-public class TabFillingRegistry { //TODO Need to change around a bit
+public class TabFillingRegistry { //TODO Need to reimplement, fabricified
 
     private static final Map<ResourceKey<CreativeModeTab>, List<ITabFiller>> FILLERS = new IdentityHashMap<>();
 

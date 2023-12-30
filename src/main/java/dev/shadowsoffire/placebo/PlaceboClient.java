@@ -39,13 +39,9 @@ public class PlaceboClient implements ClientModInitializer {
         PatreonDisableMessage.initClient();
     }
 
-
     public static long ticks = 0;
-
 
     public static float getColorTicks() {
         return (ticks + Minecraft.getInstance().getDeltaFrameTime()) / 0.5F;
     }
-
-
 }

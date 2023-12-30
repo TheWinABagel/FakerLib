@@ -1,7 +1,7 @@
 package dev.shadowsoffire.placebo.menu;
 
 import dev.shadowsoffire.placebo.Placebo;
-import dev.shadowsoffire.placebo.mixin.AbstractContainerMenuInvoker;
+import dev.shadowsoffire.placebo.mixin.getters.AbstractContainerMenuInvoker;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;

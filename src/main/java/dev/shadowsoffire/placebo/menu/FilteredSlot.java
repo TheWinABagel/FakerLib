@@ -3,7 +3,6 @@ package dev.shadowsoffire.placebo.menu;
 import com.google.common.base.Predicates;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.item.SlotItemHandler;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Predicate;

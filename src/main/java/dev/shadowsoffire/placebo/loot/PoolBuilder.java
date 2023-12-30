@@ -1,5 +1,6 @@
 package dev.shadowsoffire.placebo.loot;
 
+import dev.shadowsoffire.placebo.mixin.getters.BuilderAccessor;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
@@ -18,17 +19,17 @@ public class PoolBuilder extends LootPool.Builder {
     }
 
     public PoolBuilder addEntries(LootPoolEntryContainer... entries) {
-        this.entries.addAll(Arrays.asList(entries));
+        ((BuilderAccessor) this).getEntries().addAll(Arrays.asList(entries));
         return this;
     }
 
     public PoolBuilder addCondition(LootItemCondition... conditions) {
-        this.conditions.addAll(Arrays.asList(conditions));
+        ((BuilderAccessor) this).getConditions().addAll(Arrays.asList(conditions));
         return this;
     }
 
     public PoolBuilder addFunc(LootItemFunction... conditions) {
-        this.functions.addAll(Arrays.asList(conditions));
+        ((BuilderAccessor) this).getFunctions().addAll(Arrays.asList(conditions));
         return this;
     }
 

@@ -3,19 +3,22 @@
   "package": "dev.shadowsoffire.placebo.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "AbstractContainerMenuInvoker",
     "AnvilBlockMixin",
     "EnchantmentHelperMixin",
     "ItemStackMixin",
-    "LootTablesMixin",
-    "ReloadableServerResourcesMixin"
+    "ReloadableServerResourcesMixin",
+    "getters.AbstractContainerMenuInvoker",
+    "getters.BuilderAccessor",
+    "getters.LivingEntityRendererAccessor",
+    "getters.MinecraftServerAccessor",
+    "getters.TextColorGetter"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
     "ChatComponentMixin",
-    "PlayerMixin",
-    "EntityRenderDispatcherMixin"
+    "EntityRenderDispatcherMixin",
+    "PlayerMixin"
   ]
 }

@@ -1,4 +1,4 @@
-package dev.shadowsoffire.placebo.mixin;
+package dev.shadowsoffire.placebo.mixin.getters;
 
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;

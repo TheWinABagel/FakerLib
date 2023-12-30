@@ -18,8 +18,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 
 import java.lang.reflect.Type;
-import java.util.Objects;
-import java.util.Random;
 import java.util.UUID;
 
 public record RandomAttributeModifier(Attribute attribute, Operation op, StepFunction value, UUID id) {
@@ -54,8 +52,8 @@ public record RandomAttributeModifier(Attribute attribute, Operation op, StepFun
         AttributeModifier modif = this.create(rand);
         AttributeInstance inst = entity.getAttribute(this.attribute);
         if (inst == null) {
-            Placebo.LOGGER
-                    .trace(String.format("Attempted to apply a random attribute modifier to an entity (%s) that does not have that attribute (%s)!", EntityType.getKey(entity.getType()), BuiltInRegistries.ATTRIBUTE.getKey(this.attribute)));
+            Placebo.LOGGER.trace(String.format("Attempted to apply a random attribute modifier to an entity (%s) that does not have that attribute (%s)!",
+                    EntityType.getKey(entity.getType()), BuiltInRegistries.ATTRIBUTE.getKey(this.attribute)));
             return;
         }
         inst.addPermanentModifier(modif);

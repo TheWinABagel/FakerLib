@@ -1,6 +1,10 @@
 
 
 
+## 0.1.1
+* Update to be in line with latest Placebo (8.6.1)
+* Code cleanup and complete removal of porting lib dependency
+
 ## 0.1.0
 * Update to be in line with latest Placebo (8.6.0)
 * Fix trails + wings disabling disconnecting client on dedicated servers

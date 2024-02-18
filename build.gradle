@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.3-SNAPSHOT'
+	id 'fabric-loom' version '1.5-SNAPSHOT'
 	id 'maven-publish'
 	id "com.modrinth.minotaur" version "2.+"
 	id 'net.darkhax.curseforgegradle' version "1.1.16"
@@ -20,25 +20,12 @@ repositories {
 		url = 'https://maven.parchmentmc.org'
 	}
 	maven {
-		name = "Porting Lib"
-		url = "https://mvn.devos.one/snapshots/"
-		content {
-		}
-	}
-	maven {
 		name = "mixin-extras"
 		url = "https://jitpack.io"
 		content {
 			includeGroupByRegex "com.github.*"
 		}
 	}
-	maven {
-		url "https://maven.jamieswhiteshirt.com/libs-release"
-		content {
-			includeGroup "com.jamieswhiteshirt"
-		}
-	}
-	mavenCentral() //DevLogin
 }
 
 dependencies {
@@ -50,17 +37,8 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation(include("com.jamieswhiteshirt:reach-entity-attributes:${project.reach_lib_version}"))
-
-	//Porting lib
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:accessors:${project.port_lib_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:transfer:${project.port_lib_version}"))
-
-	// Mixin Extras + Mixin^2 for mod compat
-	include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${project.mixin_extras_version}")))
+	// Mixin^2 for the more *cursed* mod compat
 	include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:${project.mixin_squared_version}")))
-
-	modImplementation "com.ptsmods:devlogin:3.4.1"
 }
 
 loom {

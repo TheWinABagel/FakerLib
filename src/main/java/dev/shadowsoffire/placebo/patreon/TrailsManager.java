@@ -71,7 +71,6 @@ public class TrailsManager {
     public static void keys() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (PlaceboClient.TOGGLE_TRAILS.consumeClick()) {
-                //to server
                 PatreonDisableMessage.sendToServer(new PatreonDisableMessage(0, client.player.getUUID()));
             }
         });

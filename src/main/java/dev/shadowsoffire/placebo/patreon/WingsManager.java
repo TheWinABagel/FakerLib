@@ -43,23 +43,18 @@ public class WingsManager {
                 // not possible
             }
             Placebo.LOGGER.info("Loaded {} patreon wings.", WINGS.size());
-        //    if (WINGS.size() > 0) MinecraftForge.EVENT_BUS.register(WingsManager.class);
         }, "Placebo (FakerLib) Patreon Wing Loader").start();
     }
 
     public static void keys() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (PlaceboClient.TOGGLE_WINGS.consumeClick()) {
-                //to server
                 PatreonDisableMessage.sendToServer(new PatreonDisableMessage(1, client.player.getUUID()));
             }
         });
     }
 
-
-
     public static WingType getType(UUID id) {
         return WINGS.get(id);
     }
-
 }

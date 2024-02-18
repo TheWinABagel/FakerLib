@@ -87,7 +87,6 @@ public final class RecipeHelper {
 
             if (!vanilla.isEmpty())
                 ingredients.add(Ingredient.fromValues(vanilla.stream().flatMap((i) -> Arrays.stream(i.values))));
-
             if (ingredients.size() == 0)
                 throw new JsonSyntaxException("Item array cannot be empty, at least one item must be defined");
 

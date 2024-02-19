@@ -2,6 +2,7 @@
 
 
 ## 0.1.1
+* Note for devs: This version changes the maven artifact location!
 * Update to be in line with latest Placebo (8.6.1)
 * Code cleanup and complete removal of porting lib dependency
 

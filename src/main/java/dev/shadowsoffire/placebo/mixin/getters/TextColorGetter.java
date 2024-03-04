@@ -11,6 +11,7 @@ import java.util.Map;
 public interface TextColorGetter {
 
     @Accessor
+    @Mutable
     public static Map<String, TextColor> getNAMED_COLORS() {
         throw new AssertionError();
     }

@@ -91,6 +91,10 @@ public class PlaceboUtil {
     static boolean late = false;
     static Map<ResourceLocation, RecipeType<?>> unregisteredTypes = new HashMap<>();
 
+    /**
+     * Use {@link RecipeType#register(String)} instead
+     * */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static <T extends Recipe<?>> RecipeType<T> makeRecipeType(final String pIdentifier) {
         if (late) throw new RuntimeException("Attempted to register a recipe type after the registration period closed.");
@@ -117,7 +121,9 @@ public class PlaceboUtil {
      * This is not required for any static color values, because they can be represented as a hex int.
      */
     public static <T extends TextColor> void registerCustomColor(T color) {
-        TextColorGetter.getNAMED_COLORS().put(color.serialize(), color);
+        Map<String, TextColor> map = new HashMap<>(TextColorGetter.getNAMED_COLORS());
+        map.put(color.serialize(), color);
+        TextColorGetter.setNAMED_COLORS(map);
     }
 
 }

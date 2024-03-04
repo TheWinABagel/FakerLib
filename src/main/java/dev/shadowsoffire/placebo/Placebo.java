@@ -11,6 +11,7 @@ import dev.shadowsoffire.placebo.packets.PatreonDisableMessage;
 import dev.shadowsoffire.placebo.patreon.TrailsManager;
 import dev.shadowsoffire.placebo.patreon.WingsManager;
 import dev.shadowsoffire.placebo.reload.DynamicRegistry;
+import dev.shadowsoffire.placebo.tabs.TabFillingRegistry;
 import dev.shadowsoffire.placebo.util.PlaceboTaskQueue;
 import dev.shadowsoffire.placebo.util.PlaceboUtil;
 import net.fabricmc.api.ModInitializer;
@@ -26,7 +27,6 @@ public class Placebo implements ModInitializer {
     public static final String MODID = "fakerlib";
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
-
     @Override
     public void onInitialize() {
         PlaceboTaskQueue.init();
@@ -35,7 +35,6 @@ public class Placebo implements ModInitializer {
         PatreonDisableMessage.initServer();
         registerCommands();
         TextColorGetter.setNAMED_COLORS(new HashMap<>(TextColorGetter.getNAMED_COLORS()));
-        //TextColor.NAMED_COLORS = new HashMap<>(TextColor.NAMED_COLORS);
         PlaceboUtil.registerCustomColor(GradientColor.RAINBOW);
         DynamicRegistry.sync();
         GearSetRegistry.INSTANCE.register();
@@ -43,8 +42,8 @@ public class Placebo implements ModInitializer {
         StackLootEntry.poke();
         WingsManager.init();
         TrailsManager.init();
+        TabFillingRegistry.fillTabs();
     }
-
 
     public void registerCommands() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

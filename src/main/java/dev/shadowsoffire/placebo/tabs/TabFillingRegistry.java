@@ -1,20 +1,22 @@
 package dev.shadowsoffire.placebo.tabs;
 
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.ItemLike;
+import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
  * Class for managing the new method of filling creative tabs,
  * without having to bulk all the logic into one master method.
  */
-public class TabFillingRegistry { //TODO Need to reimplement, fabricified
+public class TabFillingRegistry {
 
     private static final Map<ResourceKey<CreativeModeTab>, List<ITabFiller>> FILLERS = new IdentityHashMap<>();
 
@@ -88,11 +90,15 @@ public class TabFillingRegistry { //TODO Need to reimplement, fabricified
     public static void register(ResourceKey<CreativeModeTab> tab, Supplier<? extends ItemLike>... items) {
         for (var item : items) registerInternal(tab, ITabFiller.delegating(item));
     }
-/*
+
     @ApiStatus.Internal
-    public static void fillTabs(BuildCreativeModeTabContentsEvent e) {
-        FILLERS.getOrDefault(e.getTabKey(), Collections.emptyList()).forEach(f -> f.fillItemCategory(e.getTab(), e));
-    }*/
+    public static void fillTabs() {
+        ItemGroupEvents.MODIFY_ENTRIES_ALL.register((tab, entries) -> {
+            ResourceKey<CreativeModeTab> tabKey = BuiltInRegistries.CREATIVE_MODE_TAB.getResourceKey(tab)
+                    .orElse(ResourceKey.create(Registries.CREATIVE_MODE_TAB, new ResourceLocation("placebo", "dummy_tab")));
+            FILLERS.getOrDefault(tabKey, Collections.emptyList()).forEach(f -> f.fillItemCategory(tab, entries));
+        });
+    }
 
     private static void registerInternal(ResourceKey<CreativeModeTab> tab, ITabFiller filler) {
         FILLERS.computeIfAbsent(tab, k -> new ArrayList<>()).add(filler);

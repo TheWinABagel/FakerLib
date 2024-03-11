@@ -9,7 +9,6 @@
     "ReloadableServerResourcesMixin",
     "getters.AbstractContainerMenuInvoker",
     "getters.BuilderAccessor",
-    "getters.LivingEntityRendererAccessor",
     "getters.MinecraftServerAccessor",
     "getters.TextColorGetter"
   ],
@@ -19,6 +18,7 @@
   "client": [
     "ChatComponentMixin",
     "EntityRenderDispatcherMixin",
+    "getters.LivingEntityRendererAccessor",
     "PlayerMixin"
   ]
 }

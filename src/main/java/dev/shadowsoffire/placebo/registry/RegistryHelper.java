@@ -4,6 +4,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stat;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.crafting.Recipe;
@@ -39,31 +41,35 @@ public class RegistryHelper {
         this.modid = modid;
     }
 
-    public <T extends Block> Block block(String path, T block) {
+    public <T extends Block> T block(String path, T block) {
         return create(this.modid, path, BuiltInRegistries.BLOCK, block);
     }
 
-    public <T extends Fluid> Fluid fluid(String path, T fluid) {
+    public <T extends Fluid> T fluid(String path, T fluid) {
         return create(this.modid, path, BuiltInRegistries.FLUID, fluid);
     }
 
-    public <T extends Item> Item item(String path, T item) {
+    public <T extends Item> T item(String path, T item) {
         return create(this.modid, path, BuiltInRegistries.ITEM, item);
     }
 
-    public <T extends MobEffect> MobEffect effect(String path, T effect) {
+    public <T extends CreativeModeTab> CreativeModeTab tab(ResourceKey<CreativeModeTab> tabKey, T tab) {
+        return Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, tabKey, tab);
+    }
+
+    public <T extends MobEffect> T effect(String path, T effect) {
         return create(this.modid, path, BuiltInRegistries.MOB_EFFECT, effect);
     }
 
-    public <T extends SoundEvent> SoundEvent sound(String path, T sound) {
+    public <T extends SoundEvent> T sound(String path, T sound) {
         return create(this.modid, path, BuiltInRegistries.SOUND_EVENT, sound);
     }
 
-    public <T extends Potion> Potion potion(String path, T potion) {
+    public <T extends Potion> T potion(String path, T potion) {
         return create(this.modid, path, BuiltInRegistries.POTION, potion);
     }
 
-    public <T extends Enchantment> Enchantment enchant(String path, T enchant) {
+    public <T extends Enchantment> T enchant(String path, T enchant) {
         return create(this.modid, path, BuiltInRegistries.ENCHANTMENT, enchant);
     }
 

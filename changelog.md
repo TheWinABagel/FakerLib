@@ -1,6 +1,10 @@
 
 
 
+## 0.1.3
+* Fix Reg helper
+* Move a client mixin to only register when on client
+
 ## 0.1.2
 * Readd RegObjHelper and ITabFiller
 * Fix custom colors crashing the game

@@ -1,6 +1,9 @@
 
 
 
+## 0.1.4
+* Update to be in line with latest Placebo (8.6.2)
+
 ## 0.1.3
 * Fix Reg helper
 * Move a client mixin to only register when on client

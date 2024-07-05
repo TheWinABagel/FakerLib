@@ -36,22 +36,24 @@ public class QuickMoveHandler {
             slotStackCopy = slotStack.copy();
             boolean matched = false;
             for (QuickMoveRule rule : this.rules) {
-                if (rule.req.test(slotStack, index)) {
+                if (rule.req.test(slotStack, index) && slot.mayPickup(player)) {
                     // moveMenuItemStackTo returns true if it successfully moved any amount of the item.
                     if (!container.moveMenuItemStackTo(slotStack, rule.startIdx, rule.endIdx, rule.reversed)) {
                         return ItemStack.EMPTY; // Aborting here means the move is impossible, as no transfer was accomplished with the matched rule.
                     }
+                    slot.onTake(player, slotStack);
                     container.onQuickMove(slotStackCopy, slotStack, slot);
                     matched = true;
                     break;
                 }
             }
+
+            // If none of the rules match, we have no work to do. Abort early.
             if (!matched) {
-                Placebo.LOGGER.error("Failed to perform a quick move for container {}, which would have resulted in an infinite loop!", container);
                 return ItemStack.EMPTY;
             }
             if (slotStack.isEmpty()) {
-                slot.set(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY); // Calls setChanged
             }
             else {
                 slot.setChanged();

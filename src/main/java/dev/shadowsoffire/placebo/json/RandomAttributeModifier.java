@@ -56,7 +56,13 @@ public record RandomAttributeModifier(Attribute attribute, Operation op, StepFun
                     EntityType.getKey(entity.getType()), BuiltInRegistries.ATTRIBUTE.getKey(this.attribute)));
             return;
         }
-        inst.addPermanentModifier(modif);
+        // Check if the modifier already exists before adding it
+        if (inst.getModifier(modif.getId()) == null) {
+            inst.addPermanentModifier(modif);
+        } else {
+            Placebo.LOGGER.warn(String.format("Duplicate attribute modifier detected! Entity: %s, Attribute: %s, Modifier: %s",
+                    EntityType.getKey(entity.getType()), BuiltInRegistries.ATTRIBUTE.getKey(this.attribute), modif.getId()));
+        }
     }
 
     public AttributeModifier create(RandomSource rand) {

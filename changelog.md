@@ -1,5 +1,6 @@
 
-
+## 0.1.5
+* Fix duplicate attribute modifier crash
 
 ## 0.1.4
 * Update to be in line with latest Placebo (8.6.2)
